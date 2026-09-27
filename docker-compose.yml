@@ -1,0 +1,416 @@
+name: dispatcher112
+
+x-unprivileged: &unprivileged
+  user: '10001:10001'
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs: ['/tmp:rw,nosuid,nodev,size=536870912,mode=1777']
+
+services:
+  prepare_runtime:
+    build: ./backend
+    image: dispatcher112-backend
+    user: '0:0'
+    command: [python, -m, app.operations.runtime_files]
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER, DAC_OVERRIDE]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - ./backend:/app:ro
+      - ./.secrets:/secrets:ro
+      - ./data:/data
+      - runtime_backend:/prepared/backend
+      - runtime_worker:/prepared/worker
+      - runtime_sip_worker:/prepared/sip_worker
+      - runtime_telephony:/prepared/telephony
+      - runtime_frontend:/prepared/frontend
+      - runtime_gateway:/prepared/gateway
+      - runtime_languagetool:/prepared/languagetool
+      - runtime_ollama:/prepared/ollama
+
+  migrate:
+    build: ./backend
+    image: dispatcher112-backend
+    user: '0:0'
+    command: [python, -m, app.operations.database]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dispatcher}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dispatcher}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Run make bootstrap}
+      BACKUP_DB_PASSWORD: ${BACKUP_DB_PASSWORD:?Run make bootstrap}
+      JWT_SECRET: ${JWT_SECRET:?Run make bootstrap}
+    volumes:
+      - ./backend:/app:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [local]
+
+  control:
+    profiles: [technical-control]
+    user: '0:0'
+    build: ./backend
+    image: dispatcher112-backend
+    command: [uvicorn, app.operations.control:app, --host, '0.0.0.0', --port, '8090', --no-access-log]
+    volumes:
+      - ./backend:/app:ro
+      - ./data/operations:/data/operations
+      - ./.secrets/control:/control:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks: [local]
+    security_opt: [no-new-privileges:true]
+
+  postgres:
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - '/tmp:rw,nosuid,nodev,size=67108864,mode=1777'
+      - '/var/run/postgresql:rw,nosuid,nodev,size=16777216,mode=3777'
+    restart: unless-stopped
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dispatcher}
+      POSTGRES_DB: ${POSTGRES_DB:-dispatcher}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run make bootstrap}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [local]
+
+  redis:
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, SETGID, SETUID]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ['/tmp:rw,nosuid,nodev,size=16777216,mode=1777']
+    restart: unless-stopped
+    image: redis:7
+    command: [redis-server, --appendonly, 'yes']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [local]
+
+  languagetool:
+    <<: *unprivileged
+    restart: unless-stopped
+    build: ./infra/languagetool
+    command: [java, -cp, languagetool-server.jar, org.languagetool.server.HTTPServer, --port, '8081', --public, --config, /opt/languagetool/server.properties]
+    volumes:
+      - ./infra/languagetool/server.properties:/opt/languagetool/server.properties:ro
+    environment:
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx768m
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --data, language=ru-RU, --data-urlencode, 'text=Машына приехала.', http://localhost:8081/v2/check]
+      interval: 5s
+      timeout: 10s
+      retries: 40
+      start_period: 30s
+    networks: [local]
+
+  backend:
+    <<: *unprivileged
+    restart: unless-stopped
+    build: ./backend
+    environment: &backend-environment
+      DATABASE_URL: postgresql+asyncpg://dispatcher_app:${APP_DB_PASSWORD:?Run make bootstrap}@postgres:5432/${POSTGRES_DB:-dispatcher}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:?Run make bootstrap}
+      LANGUAGETOOL_URL: http://languagetool:8081
+      GENERATION_BACKEND: ${GENERATION_BACKEND:-template}
+      LOCAL_LLM_URL: ${LOCAL_LLM_URL:-http://ollama:11434}
+      LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-qwen2.5:3b}
+      STT_ENABLED: ${STT_ENABLED:-false}
+      MYPY_CACHE_DIR: /cache/mypy
+    volumes:
+      - ./backend:/app:ro
+      - ./data:/data:ro
+      - ./data/materials:/data/materials
+      - ./data/telephony/speech:/data/telephony/speech
+      - ./data/backup-operations/requests:/data/backup-operations/requests
+      - ./data/feedback.jsonl:/data/feedback.jsonl
+      - runtime_backend:/run:ro
+      - ./frontend/public/fonts:/ui/fonts:ro
+      - ./frontend/src/styles:/ui/styles:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      prepare_runtime: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    networks: [local]
+
+  worker:
+    <<: *unprivileged
+    restart: unless-stopped
+    build: ./backend
+    command: [arq, app.worker.WorkerSettings, --custom-log-dict, app.logging.LOG_CONFIG]
+    environment: *backend-environment
+    volumes:
+      - ./backend:/app:ro
+      - ./data:/data:ro
+      - runtime_worker:/run:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      prepare_runtime: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -m, app.operations.worker_health]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [local]
+
+  frontend:
+    <<: *unprivileged
+    restart: unless-stopped
+    build: ./frontend
+    image: dispatcher112-frontend
+    environment:
+      HOME: /tmp
+      VITE_CACHE_DIR: /tmp/vite
+    tmpfs:
+      - '/tmp:rw,nosuid,nodev,size=268435456,mode=1777'
+      - '/app/node_modules/.vite-temp:rw,nosuid,nodev,size=16777216,mode=1777'
+    volumes:
+      - ./frontend/src:/app/src:ro
+      - ./frontend/public:/app/public:ro
+      - ./frontend/package.json:/app/package.json:ro
+      - ./frontend/package-lock.json:/app/package-lock.json:ro
+      - ./frontend/vite.config.ts:/app/vite.config.ts:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+      - ./frontend/eslint.config.js:/app/eslint.config.js:ro
+      - ./frontend/index.html:/app/index.html:ro
+      - runtime_frontend:/run:ro
+    depends_on:
+      backend: {condition: service_healthy}
+      prepare_runtime: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://localhost:5173').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    networks: [local]
+
+  frontend_checks:
+    profiles: [checks]
+    build: ./frontend
+    image: dispatcher112-frontend
+    user: '0:0'
+    network_mode: none
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/package-lock.json:/app/package-lock.json
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/eslint.config.js:/app/eslint.config.js
+      - ./frontend/index.html:/app/index.html
+  gateway:
+    <<: *unprivileged
+    restart: unless-stopped
+    image: nginx:1.28-alpine
+    entrypoint: [nginx]
+    command: [-g, 'daemon off;']
+    ports:
+      - 127.0.0.1:8000:8000
+      - 127.0.0.1:5173:5173
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - runtime_gateway:/run:ro
+    depends_on:
+      backend: {condition: service_healthy}
+      frontend: {condition: service_healthy}
+      prepare_runtime: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8000/healthz]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    networks: [local, entry]
+
+  backup:
+    user: '0:0'
+    group_add: ['10001']
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    stop_grace_period: 180s
+    healthcheck:
+      test: [CMD, python3, -m, app.operations.backup_worker, --health]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    build:
+      context: .
+      dockerfile: infra/backup/Dockerfile
+    environment:
+      PGHOST: postgres
+      PYTHONDONTWRITEBYTECODE: '1'
+      PGUSER: dispatcher_backup
+      PGDATABASE: ${POSTGRES_DB:-dispatcher}
+      PGPASSWORD: ${BACKUP_DB_PASSWORD:?Run make bootstrap}
+      TZ: Europe/Moscow
+    volumes:
+      - ./.backups:/backups
+      - ./data/backup-status:/status
+      - ./data/backup-operations:/queue
+      - ./data:/source:ro
+      - ./infra:/config/infra:ro
+      - ./docker-compose.yml:/config/docker-compose.yml:ro
+      - ./.env:/config/.env:ro
+      - ./.secrets:/config/.secrets:ro
+      - ./backend:/program/backend:ro
+      - ./frontend:/program/frontend:ro
+      - ./scripts:/program/scripts:ro
+      - ./docs:/program/docs:ro
+      - ./Makefile:/program/Makefile:ro
+      - ./.env.example:/program/.env.example:ro
+      - ./.dockerignore:/program/.dockerignore:ro
+      - ./README.md:/program/README.md:ro
+      - ./README-SPEC.md:/program/README-SPEC.md:ro
+      - ./SPEC.md:/program/SPEC.md:ro
+      - ./API.md:/program/API.md:ro
+      - ./UI.md:/program/UI.md:ro
+      - ./PLAN.md:/program/PLAN.md:ro
+      - backup_scratch:/tmp
+    depends_on:
+      postgres: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      prepare_runtime: {condition: service_completed_successfully}
+    networks: [local]
+
+  ollama:
+    <<: *unprivileged
+    restart: unless-stopped
+    image: ollama/ollama:0.34.4
+    environment:
+      HOME: /tmp
+      OLLAMA_MODELS: /models
+      OLLAMA_NO_CLOUD: '1'
+      OLLAMA_NUM_PARALLEL: '1'
+      OLLAMA_MAX_LOADED_MODELS: '1'
+      OLLAMA_CONTEXT_LENGTH: '2048'
+      OLLAMA_KEEP_ALIVE: '2m'
+    volumes:
+      - ./data/llm/models:/models:ro
+    healthcheck:
+      test: [CMD, ollama, list]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [local]
+
+  telephony:
+    <<: *unprivileged
+    tmpfs:
+      - '/tmp:rw,nosuid,nodev,size=67108864,mode=1777'
+      - '/run/asterisk:rw,nosuid,nodev,size=16777216,mode=0700,uid=10001,gid=10001'
+      - '/var/log/asterisk:rw,nosuid,nodev,size=33554432,mode=0700,uid=10001,gid=10001'
+      - '/var/spool/asterisk:rw,nosuid,nodev,size=67108864,mode=0700,uid=10001,gid=10001'
+      - '/var/cache/asterisk:rw,nosuid,nodev,size=16777216,mode=0700,uid=10001,gid=10001'
+    restart: unless-stopped
+    build: ./infra/telephony
+    hostname: telephony
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?Run make bootstrap}
+      SIP_MEDIA_ADDRESS: ${SIP_MEDIA_ADDRESS:-127.0.0.1}
+    ports:
+      - '${SIP_MEDIA_BIND:-127.0.0.1}:10000-10199:10000-10199/udp'
+    volumes:
+      - ./data/telephony:/data/telephony
+      - ./data/voices:/data/voices:ro
+      - ./data/telephony/recordings:/var/spool/asterisk/recording
+      - runtime_telephony:/run/credentials:ro
+    depends_on:
+      prepare_runtime: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, asterisk, -rx, 'core show uptime']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    networks: [local, entry]
+
+  sip_worker:
+    <<: *unprivileged
+    restart: unless-stopped
+    build: ./backend
+    image: dispatcher112-backend
+    command: [python, -m, app.sip_worker]
+    environment: *backend-environment
+    volumes:
+      - ./backend:/app:ro
+      - ./data:/data:ro
+      - ./data/telephony:/data/telephony
+      - ./data/telephony/recordings:/data/telephony/recordings:ro
+      - runtime_sip_worker:/run:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+      telephony: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      prepare_runtime: {condition: service_completed_successfully}
+    networks: [local]
+
+  checks:
+    profiles: [checks]
+    user: '0:0'
+    build: ./backend
+    image: dispatcher112-backend
+    environment:
+      <<: *backend-environment
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dispatcher}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dispatcher}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Run make bootstrap}
+      BACKUP_DB_PASSWORD: ${BACKUP_DB_PASSWORD:?Run make bootstrap}
+    volumes:
+      - ./backend:/app
+      - ./backend:/installer/backend:ro
+      - ./scripts:/installer/scripts:ro
+      - ./docker-compose.yml:/installer/docker-compose.yml:ro
+      - ./docker-compose.tls.yml:/installer/docker-compose.tls.yml:ro
+      - ./data:/data
+      - checks_cache:/cache
+      - ./frontend/public/fonts:/ui/fonts:ro
+      - ./frontend/src/styles:/ui/styles:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    networks: [local]
+
+volumes:
+  backup_scratch:
+  runtime_backend:
+  runtime_worker:
+  runtime_sip_worker:
+  runtime_telephony:
+  runtime_frontend:
+  runtime_gateway:
+  runtime_languagetool:
+  runtime_ollama:
+  postgres_data:
+  redis_data:
+  checks_cache:
+
+networks:
+  local:
+    internal: true
+  entry:

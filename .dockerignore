@@ -1,0 +1,23 @@
+.git
+.env
+.secrets
+.backups
+.recovery
+.updates
+.release-signing
+.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/node_modules
+**/dist
+artifacts
+data
+данные UI
+.tools
+.offline-*
+.browser-cache
+.runtime
+delivery
+.presentation

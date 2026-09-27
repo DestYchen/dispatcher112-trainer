@@ -1,0 +1,131 @@
+.console {
+  border: var(--border) solid var(--line-strong);
+  margin-top: var(--s6);
+  padding: var(--s4);
+  background: var(--panel);
+  min-width: 0;
+}
+.summary {
+  display: grid;
+  grid-template-columns: var(--lesson-summary-columns);
+  background: var(--panel);
+  border: var(--border) solid var(--line);
+  margin: var(--s4) 0;
+}
+.summary > div {
+  padding: var(--s3) var(--s4);
+  min-width: 0;
+}
+.summary > div + div {
+  border-left: var(--border) solid var(--line);
+}
+.summary dt,
+.meta {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.summary dd {
+  margin: var(--s1) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+}
+.filters {
+  display: grid;
+  grid-template-columns: var(--form-columns);
+  padding: 0 0 var(--s4);
+}
+.lessons {
+  min-width: 0;
+  display: var(--lesson-table-display);
+}
+.lessons thead {
+  display: var(--lesson-head-display);
+}
+.lessons tbody {
+  display: var(--lesson-body-display);
+}
+.lessons tr {
+  display: var(--lesson-row-display);
+  border-bottom: var(--lesson-row-border) solid var(--line);
+}
+.lessons td:first-child {
+  width: var(--lesson-title-width);
+}
+.lessons td {
+  display: var(--lesson-cell-display);
+  border-bottom: var(--lesson-cell-border) solid var(--line);
+  vertical-align: top;
+}
+.meta {
+  margin-top: var(--s1);
+}
+.badge {
+  display: inline-block;
+  padding: var(--s1) var(--s2);
+  border: var(--border) solid var(--line);
+  background: var(--panel-sunken);
+  font-weight: var(--weight-bold);
+}
+.badge[data-state="RUNNING"] {
+  color: var(--select);
+  background: var(--select-bg);
+  border-color: var(--select);
+}
+.badge[data-state="FINISHED"] {
+  color: var(--ok);
+  background: var(--ok-bg);
+  border-color: var(--ok);
+}
+.lessonActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.lessonActions button {
+  margin: 0;
+}
+.section {
+  padding: var(--s4);
+  border-bottom: var(--border) solid var(--line);
+}
+.alert {
+  background: var(--alarm-bg);
+}
+.online {
+  color: var(--ok);
+}
+.offline {
+  color: var(--ink-muted);
+}
+.changed {
+  animation: changed var(--change-duration) ease-out;
+}
+@keyframes changed {
+  from {
+    background: var(--select-bg);
+  }
+  to {
+    background: transparent;
+  }
+}
+.observation {
+  display: grid;
+  grid-template-columns: var(--observation-columns);
+  align-items: start;
+}
+.observation > * {
+  min-width: 0;
+}
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  padding: var(--s3);
+}
+.queue button {
+  text-align: left;
+}
+.queue button[aria-pressed="true"] {
+  background: var(--select-bg);
+  color: var(--select);
+}

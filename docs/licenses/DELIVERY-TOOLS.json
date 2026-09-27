@@ -1,0 +1,51 @@
+[
+  {
+    "name": "python-docx",
+    "version": "1.2.0",
+    "license": "MIT",
+    "notices": [
+      "docs/licenses/delivery-tools/python-docx/LICENSE"
+    ]
+  },
+  {
+    "name": "python-pptx",
+    "version": "1.0.2",
+    "license": "MIT",
+    "notices": [
+      "docs/licenses/delivery-tools/python-pptx/LICENSE"
+    ]
+  },
+  {
+    "name": "lxml",
+    "version": "6.1.3",
+    "license": "BSD-3-Clause",
+    "notices": [
+      "docs/licenses/delivery-tools/lxml/LICENSE.txt",
+      "docs/licenses/delivery-tools/lxml/LICENSES.txt"
+    ]
+  },
+  {
+    "name": "xlsxwriter",
+    "version": "3.2.9",
+    "license": "BSD-2-Clause",
+    "notices": [
+      "docs/licenses/delivery-tools/XlsxWriter/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "pillow",
+    "version": "12.3.0",
+    "license": "MIT-CMU",
+    "notices": [
+      "docs/licenses/delivery-tools/Pillow/LICENSE"
+    ]
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "license": "PSF-2.0",
+    "notices": [
+      "docs/licenses/delivery-tools/typing_extensions/LICENSE"
+    ]
+  }
+]

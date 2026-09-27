@@ -1,0 +1,178 @@
+:root {
+  --surface: #edf1f4;
+  --panel: #ffffff;
+  --panel-sunken: #f5f8fa;
+  --ink: #16222e;
+  --ink-muted: #5a6b7a;
+  --ink-inverse: #ffffff;
+  --line: #c5d0d9;
+  --line-strong: #9aaab8;
+  --select: #14539b;
+  --select-bg: #e3ecf7;
+  --dispatch: #b85c14;
+  --dispatch-bg: #fbeee2;
+  --alarm: #b3231c;
+  --alarm-bg: #fae6e5;
+  --ok: #1b6340;
+  --ok-bg: #e4f0ea;
+  --warn: #8a6410;
+  --warn-bg: #fbf2dc;
+  --font-ui: "PT Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "PT Mono", "Consolas", monospace;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 21px;
+  --text-xl: 27px;
+  --text-timer: 32px;
+  --leading-tight: 1.25;
+  --leading-base: 1.5;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+  --row-h: 44px;
+  --control-h: 40px;
+  --control-h-lg: 48px;
+  --radius: 2px;
+  --focus-ring: 0 0 0 3px rgba(20, 83, 155, 0.45);
+  --border: 1px;
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --header-h: 48px;
+  --statusbar-h: 36px;
+  --workspace-min: 1280px;
+  --welcome-width: 560px;
+  --viewport-h: 100dvh;
+  --full: 100%;
+  --queue-w: clamp(240px, 20vw, 300px);
+  --actions-w: 320px;
+  --card-min: 480px;
+  --workspace-h: 720px;
+  --selection-line: 3px;
+  --own-border: 2px;
+  --queue-bar: 3px;
+  --timer-bar: 6px;
+  --comment-h: 120px;
+  --dialog-w: 560px;
+  --volume-w: 80px;
+  --backdrop: rgba(22, 34, 46, 0.5);
+  --new-duration: 600ms;
+  --change-duration: 400ms;
+  --phone-key-w: 56px;
+  --phone-layer: 5;
+  --phone-pulse: 1400ms;
+  --phone-dim: 0.55;
+  --underline-offset: 3px;
+  --results-w: 960px;
+  --results-score-w: 220px;
+  --pdf-margin: 12mm;
+  --pdf-text: 10pt;
+  --pdf-name-width: 22%;
+  --font-report: "PT Sans Report";
+  /* Responsive dimensions and breakpoints live here with the visual tokens. */
+  --page-pad: var(--s6);
+  --workspace-columns: var(--queue-w) minmax(0, 1fr) var(--actions-w);
+  --workspace-areas: "queue card actions";
+  --entry-workspace-columns: var(--queue-w) minmax(0, 1fr);
+  --entry-workspace-areas: "queue card";
+  --card-columns: repeat(2, minmax(0, 1fr));
+  --panel-position: sticky;
+  --panel-top: var(--s3);
+  --panel-max-h: calc(100dvh - var(--s6));
+  --queue-max-h: var(--panel-max-h);
+  --compact-nav-display: none;
+  --admin-tabs-display: flex;
+  --admin-selector-display: none;
+  --compact-nav-h: 52px;
+  --compact-nav-layer: 3;
+  --phone-w: 380px;
+  --page-max: 1600px;
+  --form-max: 880px;
+  --entry-service-h: 240px;
+  --entry-address-h: 64px;
+  --entry-timer-top: 0px;
+  --entry-timer-layer: 2;
+  --form-columns: repeat(2, minmax(0, 1fr));
+  --table-min: 640px;
+  --summary-columns: var(--results-score-w) minmax(0, 1fr);
+  --chart-label-w: 220px;
+  --observation-columns: var(--queue-w) minmax(0, 1fr);
+  --checkbox-size: 20px;
+  --section-heading-bg: #354552;
+  --section-heading-ink: #ffffff;
+  --anchor-offset: var(--s4);
+  --auth-width: 1040px;
+  --auth-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  --auth-pad: var(--s8);
+  --auth-form-order: 0;
+  --utility-navigation-width: auto;
+  --lesson-summary-columns: repeat(3, minmax(0, 1fr));
+  --lesson-title-width: 42%;
+  --lesson-table-display: table;
+  --lesson-head-display: table-header-group;
+  --lesson-body-display: table-row-group;
+  --lesson-row-display: table-row;
+  --lesson-cell-display: table-cell;
+  --lesson-cell-border: var(--border);
+  --lesson-row-border: 0;
+}
+
+@media (max-width: 1279px) {
+  :root {
+    --queue-w: 240px;
+    --actions-w: 280px;
+    --card-columns: minmax(0, 1fr);
+    --page-pad: var(--s4);
+  }
+}
+
+@media (max-width: 1099px) {
+  :root {
+    --workspace-columns: minmax(0, 1fr) var(--actions-w);
+    --workspace-areas: "queue queue" "card actions";
+    --entry-workspace-columns: minmax(0, 1fr);
+    --entry-workspace-areas: "queue" "card";
+    --queue-max-h: 240px;
+    --compact-nav-display: flex;
+    --entry-timer-top: var(--compact-nav-h);
+    --panel-top: calc(var(--compact-nav-h) + var(--s2));
+    --panel-max-h: calc(100dvh - var(--compact-nav-h) - var(--s4));
+    --anchor-offset: calc(var(--compact-nav-h) + var(--s4));
+    --observation-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 699px) {
+  :root {
+    --auth-columns: minmax(0, 1fr);
+    --auth-pad: var(--s5);
+    --auth-form-order: -1;
+    --utility-navigation-width: var(--full);
+    --lesson-title-width: auto;
+    --lesson-table-display: block;
+    --lesson-head-display: none;
+    --lesson-body-display: block;
+    --lesson-row-display: block;
+    --lesson-cell-display: block;
+    --lesson-cell-border: 0;
+    --lesson-row-border: var(--border);
+    --admin-tabs-display: none;
+    --admin-selector-display: flex;
+    --page-pad: var(--s3);
+    --workspace-columns: minmax(0, 1fr);
+    --workspace-areas: "queue" "card" "actions";
+    --panel-position: static;
+    --panel-max-h: none;
+    --phone-w: calc(100vw - var(--s6));
+    --form-columns: minmax(0, 1fr);
+    --summary-columns: minmax(0, 1fr);
+    --chart-label-w: 100px;
+    --text-xl: 23px;
+  }
+}

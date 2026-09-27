@@ -1,0 +1,97 @@
+[
+  {
+    "name": "websockets",
+    "version": "15.0.1",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "httpx",
+    "version": "0.28.1",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "idna",
+    "version": "3.11",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "httpcore",
+    "version": "1.0.9",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "h11",
+    "version": "0.16.0",
+    "license": "MIT"
+  },
+  {
+    "name": "certifi",
+    "version": "2025.10.5",
+    "license": "MPL-2.0"
+  },
+  {
+    "name": "anyio",
+    "version": "4.12.0",
+    "license": "MIT"
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.15.0",
+    "license": "PSF-2.0"
+  },
+  {
+    "name": "playwright",
+    "version": "1.55.0",
+    "license": "Apache-2.0"
+  },
+  {
+    "name": "greenlet",
+    "version": "3.2.4",
+    "license": "MIT AND Python-2.0"
+  },
+  {
+    "name": "pyee",
+    "version": "13.0.0",
+    "license": "MIT"
+  },
+  {
+    "name": "torch",
+    "version": "2.9.0",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "fsspec",
+    "version": "2025.10.0",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "Jinja2",
+    "version": "3.1.6",
+    "license": "BSD License"
+  },
+  {
+    "name": "MarkupSafe",
+    "version": "3.0.3",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "name": "networkx",
+    "version": "3.5",
+    "license": "BSD License"
+  },
+  {
+    "name": "sympy",
+    "version": "1.14.0",
+    "license": "BSD"
+  },
+  {
+    "name": "mpmath",
+    "version": "1.3.0",
+    "license": "BSD"
+  },
+  {
+    "name": "filelock",
+    "version": "3.20.0",
+    "license": "Unlicense"
+  }
+]

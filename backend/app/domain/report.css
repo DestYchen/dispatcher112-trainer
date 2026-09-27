@@ -1,0 +1,16 @@
+@page { size: A4 landscape; margin: var(--pdf-margin); }
+@font-face { font-family: "PT Sans Report"; src: url("file:///data/fonts/PTSans-400.ttf"); font-weight: var(--weight-regular); }
+@font-face { font-family: "PT Sans Report"; src: url("file:///data/fonts/PTSans-700.ttf"); font-weight: var(--weight-bold); }
+body { font-family: var(--font-report); font-size: var(--pdf-text); color: var(--ink); }
+h1 { font-size: var(--text-lg); }
+h2 { font-size: var(--text-md); }
+table { border-collapse: collapse; width: var(--full); table-layout: fixed; }
+th, td { padding: var(--s2); border: var(--border) solid var(--line); overflow-wrap: anywhere; }
+thead { display: table-header-group; background: var(--panel-sunken); }
+tr { break-inside: avoid; }
+.results th:first-child { width: var(--pdf-name-width); }
+.bar { background: var(--select-bg); min-width: var(--s4); }
+.hot { background: var(--alarm-bg); color: var(--alarm); }
+.cold { background: var(--panel); color: var(--ink); }
+.ok { color: var(--ok); }
+.alarm { color: var(--alarm); }

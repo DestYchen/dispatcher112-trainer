@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project]
+name = "dispatcher112"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi==0.135.1",
+  "uvicorn[standard]==0.42.0",
+  "sqlalchemy[asyncio]==2.0.48",
+  "alembic==1.18.4",
+  "asyncpg==0.31.0",
+  "pydantic-settings==2.13.1",
+  "arq==0.26.3",
+  "httpx==0.28.1",
+  "openpyxl>=3.1,<4",
+  "argon2-cffi>=23.1",
+  "pyotp>=2.9,<3",
+  "python-multipart>=0.0.20",
+  "PyJWT>=2.10,<3",
+  "cryptography==50.0.1",
+  "weasyprint==70.0",
+  "scikit-learn==1.9.1",
+  "pypdf>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.2", "pytest-asyncio==1.3.0", "ruff==0.15.6", "mypy==1.19.1", "types-openpyxl", "pypdf>=6,<7"]
+
+[[tool.mypy.overrides]]
+module = ["weasyprint.*", "sklearn.*", "threadpoolctl", "threadpoolctl.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]

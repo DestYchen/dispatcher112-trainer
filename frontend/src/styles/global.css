@@ -1,0 +1,98 @@
+@import "./fonts.css";
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: var(--text-lg);
+}
+h2 {
+  font-size: var(--text-md);
+}
+html {
+  scroll-padding-top: var(--anchor-offset);
+}
+img,
+svg {
+  max-width: var(--full);
+}
+input,
+select,
+textarea,
+fieldset {
+  min-width: 0;
+  max-width: var(--full);
+}
+fieldset {
+  margin: 0;
+  border: var(--border) solid var(--line);
+  padding: var(--s4);
+}
+legend {
+  padding: 0 var(--s2);
+  font-weight: var(--weight-bold);
+}
+a {
+  color: var(--select);
+  text-underline-offset: var(--underline-offset);
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+summary {
+  cursor: pointer;
+  min-height: var(--control-h);
+  padding: var(--s2);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  accent-color: var(--select);
+}
+button {
+  min-height: var(--control-h);
+  min-width: var(--control-h);
+  padding: var(--s2) var(--s4);
+  border: var(--border) solid var(--line-strong);
+  background: var(--panel);
+  border-radius: var(--radius);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+button:hover {
+  background: var(--panel-sunken);
+}
+button:disabled {
+  color: var(--ink-muted);
+  cursor: not-allowed;
+}
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

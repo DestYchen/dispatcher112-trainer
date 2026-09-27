@@ -1,0 +1,73 @@
+.panel {
+  position: fixed;
+  top: var(--s3);
+  right: var(--s3);
+  bottom: var(--s3);
+  width: var(--phone-w);
+  max-width: calc(var(--full) - var(--s6));
+  z-index: var(--phone-layer);
+  background: var(--panel);
+  overflow-y: auto;
+  border: var(--own-border) solid var(--line-strong);
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--s3);
+  background: var(--panel-sunken);
+}
+.number {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, var(--phone-key-w));
+  gap: var(--s1);
+}
+.keypad button {
+  height: var(--control-h-lg);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+}
+.call {
+  background: var(--ok);
+  color: var(--ink-inverse);
+}
+.call:hover {
+  background: var(--ok);
+}
+.connected {
+  color: var(--ok);
+  background: var(--ok-bg);
+  padding: var(--s4);
+}
+.dot {
+  animation: pulse var(--phone-pulse) infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: var(--phone-dim);
+  }
+}
+.phrase {
+  padding: var(--s4);
+  font-size: var(--text-md);
+}
+.directory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  list-style: none;
+  padding: var(--s3);
+}
+.directory button {
+  width: var(--full);
+  text-align: left;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}

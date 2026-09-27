@@ -1,0 +1,14 @@
+{
+  "java-diff-utils": {"license": "Apache-2.0", "source": "https://github.com/java-diff-utils/java-diff-utils/blob/master/LICENSE"},
+  "waffle-jna": {"license": "MIT", "source": "https://github.com/Waffle/waffle/blob/master/LICENSE"},
+  "fastutil-core": {"license": "Apache-2.0", "source": "https://github.com/vigna/fastutil/blob/master/LICENSE-2.0"},
+  "grpc-util": {"license": "Apache-2.0", "source": "https://github.com/grpc/grpc-java/blob/master/LICENSE"},
+  "jspecify": {"license": "Apache-2.0", "source": "https://github.com/jspecify/jspecify/blob/main/LICENSE"},
+  "netty-transport-native-unix-common": {"license": "Apache-2.0", "source": "https://github.com/netty/netty/blob/4.1/LICENSE.txt"},
+  "opentelemetry-api": {"license": "Apache-2.0", "source": "https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE"},
+  "opentelemetry-context": {"license": "Apache-2.0", "source": "https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE"},
+  "opentelemetry-semconv": {"license": "Apache-2.0", "source": "https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE"},
+  "morfologik-crh-lt": {"license": "GNU Lesser General Public License", "source": "https://repo.maven.apache.org/maven2/org/qirimca/nlp/morfologik-crh-lt/1.0.1/morfologik-crh-lt-1.0.1.pom"},
+  "linguistics.grammardb.spell.languagetool": {"license": "CC-BY-SA-4.0", "source": "https://github.com/Belarus/GrammarDB/blob/master/LICENSE.txt"},
+  "lucene-gosen-ipadic": {"license": "Apache-2.0; bundled IPADIC dictionary under its own notice", "source": "https://repo.maven.apache.org/maven2/com/github/lucene-gosen/lucene-gosen/6.2.1/lucene-gosen-6.2.1.pom"}
+}

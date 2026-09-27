@@ -1,0 +1,42 @@
+.report {
+  padding: var(--page-pad);
+  min-width: 0;
+  border-top: var(--border) solid var(--line);
+}
+.report .adminTabs {
+  display: var(--admin-tabs-display);
+}
+.report .adminSelect {
+  display: var(--admin-selector-display);
+  margin: var(--s3) 0;
+}
+.ok {
+  color: var(--ok);
+}
+.alarm {
+  color: var(--alarm);
+}
+.hot {
+  background: var(--alarm-bg);
+  color: var(--alarm);
+}
+.scroll {
+  overflow-x: auto;
+  max-width: var(--full);
+}
+.distribution {
+  display: grid;
+  gap: var(--s2);
+  max-width: var(--results-w);
+}
+.distribution > div {
+  display: grid;
+  grid-template-columns: var(--chart-label-w) minmax(0, 1fr) var(--s10);
+  gap: var(--s4);
+  align-items: center;
+}
+.distribution meter {
+  width: var(--full);
+  height: var(--s6);
+  accent-color: var(--select);
+}

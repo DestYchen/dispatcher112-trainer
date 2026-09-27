@@ -1,0 +1,78 @@
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: var(--s4);
+}
+.item {
+  padding: var(--s4);
+  border: var(--border) solid var(--line);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.item h2,
+.item h3 {
+  margin-bottom: var(--s2);
+}
+.item .item {
+  border: none;
+  border-top: var(--border) solid var(--line);
+  padding: var(--s3) 0;
+}
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.download {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-h);
+  padding: var(--s2);
+}
+.choices {
+  max-height: var(--entry-service-h);
+  overflow: auto;
+}
+.notice {
+  background: var(--panel-sunken);
+  padding: var(--s3);
+}
+.axes {
+  display: grid;
+  grid-template-columns: var(--form-columns);
+  gap: var(--s3);
+}
+.axes label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+.axes progress {
+  width: var(--full);
+  accent-color: var(--select);
+}
+.log {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: var(--entry-service-h);
+  overflow: auto;
+  background: var(--panel-sunken);
+  padding: var(--s3);
+}
+.metrics {
+  margin-bottom: var(--s4);
+}
+.metrics div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s2);
+  padding: var(--s3);
+  border-bottom: var(--border) solid var(--line);
+}
+.metrics dt {
+  font-weight: var(--weight-bold);
+}
+.metrics dd {
+  margin: 0;
+}

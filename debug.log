@@ -1,0 +1,44 @@
+[0926/111257.469:INFO:third_party\blink\renderer\modules\peerconnection\peer_connection_dependency_factory.cc:924] Running WebRTC with a combined Network and Worker thread.
+[0926/111257.742:WARNING:third_party\webrtc\rtc_base\openssl_stream_adapter.cc:155] WebRTC-ForceDtls13 Disabled
+[0926/111257.742:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/111257.955:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/111257.955:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.025:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/111258.026:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_UNREACHABLE. Dropping the packet.
+[0926/111258.093:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/111258.094:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.213:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/111258.213:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.275:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/111258.352:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.414:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_UNREACHABLE. Dropping the packet.
+[0926/111258.479:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.618:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.774:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111258.908:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_UNREACHABLE. Dropping the packet.
+[0926/111258.971:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/111259.094:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/123752.211:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/123752.212:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/123752.212:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/123752.212:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/123752.212:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/123752.212:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/123752.212:ERROR:net\socket\ssl_client_socket_impl.cc:915] handshake failed; returned -1, SSL error code 1, net_error -101
+[0926/131535.644:INFO:third_party\blink\renderer\modules\peerconnection\peer_connection_dependency_factory.cc:924] Running WebRTC with a combined Network and Worker thread.
+[0926/131535.879:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/131535.880:WARNING:third_party\webrtc\rtc_base\openssl_stream_adapter.cc:155] WebRTC-ForceDtls13 Disabled
+[0926/131536.075:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/131536.075:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/131536.152:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/131536.152:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_UNREACHABLE. Dropping the packet.
+[0926/131536.230:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/131536.230:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/131536.375:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/131536.375:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/131536.434:WARNING:net\base\net_errors_win.cc:119] Unknown error 1168 mapped to net::ERR_FAILED
+[0926/131536.496:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/131536.565:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_UNREACHABLE. Dropping the packet.
+[0926/131536.635:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/131536.777:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.
+[0926/131536.999:INFO:services\network\p2p\socket_udp.cc:474] sendto() has failed twice returning a  transient error net::ERR_ADDRESS_INVALID. Dropping the packet.

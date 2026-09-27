@@ -1,0 +1,14 @@
+.console {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  min-width: 0;
+}
+.console p {
+  margin: var(--s1) 0;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}

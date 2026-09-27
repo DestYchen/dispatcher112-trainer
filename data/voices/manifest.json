@@ -1,0 +1,47 @@
+{
+  "model_url": "https://models.silero.ai/models/tts/ru/v5_cis_base_nostress.pt",
+  "download_source": "https://huggingface.co/adeshkin/silero-models-v5-cis-base-nostress/resolve/main/v5_cis_base_nostress.pt",
+  "model_sha256": "0405777e332906f0644e08a680f7cfdc2137ea864090079c1fdd30a43c1b8761",
+  "license": "MIT",
+  "license_url": "https://github.com/snakers4/silero-models/blob/master/LICENSE_CIS",
+  "torch_version": "2.9.0+cpu",
+  "sample_rate": 24000,
+  "voices": {
+    "male_calm": {
+      "speaker": "ru_dmitriy",
+      "greeting": "Слушаю вас.",
+      "confirmation": "Я вас понял, информация принята.",
+      "files": {
+        "greeting": "4a349613b864e0cab39d45c2e8205ab520c7b6495c7910532b9e77d34ddce765",
+        "confirm": "ec61c7548943085fa5aed11521c0622c3d45e7dd34ab222081200f7ba4ae20c9"
+      }
+    },
+    "male_brisk": {
+      "speaker": "ru_igor",
+      "greeting": "Главный инженер. Докладывайте.",
+      "confirmation": "Принято. Приступаю к организации работ.",
+      "files": {
+        "greeting": "08e20c358a867998acf4624de8c30706f6e34ead14a7cb334dab5a5f62bce0d9",
+        "confirm": "94d243e8acebaa8bfa531af1e1a9d29f74c605471c128d7552776bef5b8a1546"
+      }
+    },
+    "female_calm": {
+      "speaker": "ru_ekaterina",
+      "greeting": "Служба сто двенадцать. Слушаю вас.",
+      "confirmation": "Информация принята и зарегистрирована.",
+      "files": {
+        "greeting": "d88c337bc890e6f460837e6bac8ed1f96429d2b967f4d54f64b48e521be98c24",
+        "confirm": "6a3b0de8bbee3e4d6cbf6ab28ea5085184b2ed5b93165f909aec99fe3351f3bd"
+      }
+    },
+    "female_brisk": {
+      "speaker": "ru_zinaida",
+      "greeting": "Начальник смены. Докладывайте обстановку.",
+      "confirmation": "Я вас поняла. Действуйте по обстановке.",
+      "files": {
+        "greeting": "c7eb9271343f7971a4e99d17a29a5d5605e75835ade6f2daf41de1e39fb15440",
+        "confirm": "4f2d13c0305264aa84e036ffe82c897f8769c3dbc6ca330903db53eac57c74cf"
+      }
+    }
+  }
+}

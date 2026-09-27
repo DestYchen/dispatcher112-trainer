@@ -1,0 +1,133 @@
+# Apply together with docker-compose.yml; acceptance evidence is in docs/TLS.md.
+x-tls-environment: &tls-environment
+  DATABASE_URL: postgresql+asyncpg://dispatcher_app:${APP_DB_PASSWORD:?Run bootstrap}@postgres:5432/${POSTGRES_DB:-dispatcher}?ssl=verify-full
+  REDIS_URL: rediss://:${REDIS_PASSWORD:?Run bootstrap}@redis:6379/0
+  PGSSLROOTCERT: /run/tls/ca.crt
+  SSL_CERT_FILE: /run/tls/ca.crt
+  TLS_CA_FILE: /run/tls/ca.crt
+  LANGUAGETOOL_URL: https://languagetool:8082
+  LOCAL_LLM_URL: https://ollama:11435
+  SIP_ARI_URL: https://telephony:8089/ari
+  CONTROL_URL: https://control:8090
+  COOKIE_SECURE: 'true'
+  CORS_ORIGINS: '${TLS_CORS_ORIGINS:-["https://localhost:5173","https://127.0.0.1:5173"]}'
+
+services:
+  migrate:
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dispatcher}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dispatcher}?ssl=verify-full
+      PGSSLROOTCERT: /run/tls/ca.crt
+    volumes:
+      - ./.secrets/pki/backend:/run/tls:ro
+  checks:
+    environment:
+      <<: *tls-environment
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dispatcher}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dispatcher}?ssl=verify-full
+    volumes:
+      - ./.secrets/pki/backend:/run/tls:ro
+  postgres:
+    entrypoint: [sh, /scripts/postgres-tls.sh]
+    volumes:
+      - ./.secrets/pki/postgres:/run/tls:ro
+      - ./infra/tls/postgres.sh:/scripts/postgres-tls.sh:ro
+      - ./infra/tls/pg_hba.conf:/etc/postgresql/tls_hba.conf:ro
+  redis:
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Run bootstrap}
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?Run bootstrap}
+    entrypoint: [sh, /scripts/redis-tls.sh]
+    command: []
+    volumes:
+      - ./.secrets/pki/redis:/run/tls:ro
+      - ./infra/tls/redis.sh:/scripts/redis-tls.sh:ro
+    healthcheck:
+      test: [CMD, redis-cli, --tls, --cacert, /run/tls/ca.crt, -h, redis, ping]
+  backend:
+    command: [uvicorn, app.main:app, --host, '0.0.0.0', --port, '8000', --no-access-log, --timeout-keep-alive, '30', --ssl-keyfile, /run/tls/tls.key, --ssl-certfile, /run/tls/tls.crt]
+    environment: *tls-environment
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('https://localhost:8000/healthz', timeout=2)"]
+  worker:
+    environment: *tls-environment
+  sip_worker:
+    environment: *tls-environment
+  frontend:
+    environment:
+      TLS_ENABLED: '1'
+      BACKEND_URL: https://backend:8000
+      NODE_EXTRA_CA_CERTS: /run/tls/ca.crt
+    healthcheck:
+      test: [CMD, node, -e, "fetch('https://localhost:5173').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+  gateway:
+    volumes:
+      - ./infra/tls/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: [CMD, curl, --cacert, /run/tls/ca.crt, --fail, --silent, https://localhost:8000/healthz]
+  languagetool:
+    command: [java, -cp, languagetool-server.jar, org.languagetool.server.HTTPServer, --port, '8081', --config, /opt/languagetool/server.properties]
+  languagetool_tls:
+    user: '10001:10001'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ['/tmp:rw,nosuid,nodev,size=268435456,mode=1777']
+    restart: unless-stopped
+    image: nginx:1.28-alpine
+    entrypoint: [nginx]
+    command: [-g, 'daemon off;']
+    network_mode: service:languagetool
+    depends_on:
+      languagetool: {condition: service_healthy}
+      prepare_runtime: {condition: service_completed_successfully}
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/tls/languagetool.conf:/etc/nginx/conf.d/default.conf:ro
+      - runtime_languagetool:/run:ro
+    healthcheck:
+      test: [CMD, curl, --cacert, /run/tls/ca.crt, --fail, --silent, https://localhost:8082/v2/languages]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  ollama:
+    environment:
+      OLLAMA_HOST: 127.0.0.1:11434
+  ollama_tls:
+    user: '10001:10001'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ['/tmp:rw,nosuid,nodev,size=268435456,mode=1777']
+    restart: unless-stopped
+    image: nginx:1.28-alpine
+    entrypoint: [nginx]
+    command: [-g, 'daemon off;']
+    network_mode: service:ollama
+    depends_on:
+      ollama: {condition: service_healthy}
+      prepare_runtime: {condition: service_completed_successfully}
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/tls/ollama.conf:/etc/nginx/conf.d/default.conf:ro
+      - runtime_ollama:/run:ro
+    healthcheck:
+      test: [CMD, curl, --cacert, /run/tls/ca.crt, --fail, --silent, https://localhost:11435/api/tags]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  telephony:
+    volumes:
+      - ./infra/tls/asterisk-http.conf:/etc/asterisk/http.conf:ro
+      - ./infra/tls/telephony-health.py:/scripts/tls-health.py:ro
+    healthcheck:
+      test: [CMD, python3, /scripts/tls-health.py]
+  backup:
+    environment:
+      PGSSLMODE: verify-full
+      PGSSLROOTCERT: /run/tls/ca.crt
+    volumes:
+      - ./.secrets/pki/backup:/run/tls:ro
+      - ./docker-compose.tls.yml:/config/docker-compose.tls.yml:ro
+  control:
+    command: [uvicorn, app.operations.control:app, --host, '0.0.0.0', --port, '8090', --no-access-log, --ssl-keyfile, /run/tls/tls.key, --ssl-certfile, /run/tls/tls.crt]
+    volumes:
+      - ./.secrets/pki/control:/run/tls:ro

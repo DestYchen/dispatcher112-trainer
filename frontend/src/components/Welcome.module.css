@@ -1,0 +1,58 @@
+.layout {
+  display: grid;
+  grid-template-columns: var(--auth-columns);
+}
+.intro {
+  padding: var(--auth-pad);
+  background: var(--panel-sunken);
+  border-bottom: var(--border) solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s6);
+}
+.intro h2 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
+}
+.description {
+  color: var(--ink-muted);
+}
+.steps {
+  display: grid;
+  gap: var(--s5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.steps li {
+  display: grid;
+  grid-template-columns: var(--s8) minmax(0, 1fr);
+  gap: var(--s3);
+}
+.number {
+  font-family: var(--font-mono);
+  color: var(--ink-muted);
+}
+.steps p {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  margin-top: var(--s1);
+}
+.form {
+  padding: var(--auth-pad);
+  order: var(--auth-form-order);
+}
+.form > button {
+  width: var(--full);
+  min-height: var(--control-h-lg);
+}
+.demo {
+  padding: var(--s3) var(--s4);
+  border: var(--border) solid var(--line);
+  background: var(--panel-sunken);
+}
+.demo p {
+  margin-top: var(--s1);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
