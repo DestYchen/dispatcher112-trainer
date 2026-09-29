@@ -323,6 +323,20 @@ services:
       retries: 20
     networks: [local]
 
+  stt:
+    <<: *unprivileged
+    restart: unless-stopped
+    build: ./infra/stt
+    image: dispatcher112-stt
+    volumes:
+      - ./data/stt:/models:ro
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:2700/healthz', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [local]
+
   telephony:
     <<: *unprivileged
     tmpfs:

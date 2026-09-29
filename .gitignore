@@ -36,3 +36,6 @@ delivery/
 data/backup-status/
 data/backup-operations/
 .runtime-resources.compose.json
+
+# Offline STT model (scripts/prepare_stt.py downloads it)
+data/stt/

@@ -83,3 +83,6 @@
 .checklist { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 0; font-size: 0.9em; }
 .done { color: #1d7a3a; }
 .todo { color: #7a8591; }
+.mic { border: 1px solid #1a74c4; color: #1a74c4; background: #fff; }
+.micOn { border: 1px solid #e8141b; color: #fff; background: #e8141b; animation: pulse 1.2s infinite; }
+@keyframes pulse { 50% { opacity: 0.75; } }

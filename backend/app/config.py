@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     local_llm_url: str = "http://ollama:11434"
     local_llm_model: str = "qwen2.5:3b"
     stt_enabled: bool = False
+    stt_url: str = "http://stt:2700"
     control_url: str = "http://control:8090"
     technical_control_mode: Literal["local", "controller"] = "local"
     tls_ca_file: str | None = None

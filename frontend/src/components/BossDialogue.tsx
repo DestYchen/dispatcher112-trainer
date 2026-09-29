@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api/client";
+import { startRecording, type Recording } from "../lib/recorder";
 import common from "./Common.module.css";
 import styles from "./Phone.module.css";
 
@@ -66,11 +67,52 @@ export function BossDialogue({
     }
   };
 
-  const send = async () => {
-    const said = text.trim();
+  const [recording, setRecording] = useState<Recording | null>(null);
+  const [listening, setListening] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
+  useEffect(() => () => recording?.cancel(), [recording]);
+
+  // Push-to-talk: first click starts the microphone, second click recognizes and sends.
+  const toggleMic = async () => {
+    setError(null);
+    if (!recording) {
+      try {
+        setRecording(await startRecording());
+      } catch {
+        setError("Нет доступа к микрофону. Разрешите его в браузере или введите ответ текстом.");
+      }
+      return;
+    }
+    const current = recording;
+    setRecording(null);
+    setListening(true);
+    try {
+      const audio = await current.stop();
+      const result = await api<{ text: string }>(`/student/assignments/${assignmentId}/dialogue/transcribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/octet-stream" },
+        body: audio,
+      });
+      // Street names are where recognition fails and where a mistake sends a crew to the wrong
+      // place, so the student checks the recognized phrase and sends it with Enter.
+      if (result.text.trim()) {
+        setText(result.text.trim());
+        setHint("Проверьте распознанный текст, особенно адрес, и нажмите Enter.");
+        inputRef.current?.focus();
+      } else setError("Не расслышал. Повторите или введите ответ текстом.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Распознавание недоступно. Введите ответ текстом.");
+    } finally {
+      setListening(false);
+    }
+  };
+
+  const send = async (spoken?: string) => {
+    const said = (spoken ?? text).trim();
     if (!said || busy) return;
     setBusy(true);
     setError(null);
+    setHint(null);
     setLines((rows) => [...rows, { who: "me", text: said }]);
     setText("");
     try {
@@ -130,6 +172,16 @@ export function BossDialogue({
           disabled={busy}
         />
         <button disabled={busy || !text.trim()}>{busy ? "…" : "Сказать"}</button>
+        <button
+          type="button"
+          className={recording ? styles.micOn : styles.mic}
+          disabled={busy || listening}
+          aria-pressed={!!recording}
+          onClick={() => void toggleMic()}
+        >
+          {listening ? "Распознаю…" : recording ? "■ Закончить фразу" : "🎤 Ответить голосом"}
+        </button>
+        {hint && <p role="status">{hint}</p>}
         {error && <p role="alert">{error}</p>}
       </form>
     </div>

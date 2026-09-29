@@ -5,12 +5,14 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter
+import httpx
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
 from app.api.deps import DB, Student, Teacher
 from app.api.errors import APIError
+from app.config import settings
 from app.db.models import AuditLog, DirectoryEntry, InteractionEvent, PhoneReport, Scenario
 from app.dialogue import learning
 from app.dialogue.engine import Card, Turn, load_graph, step
@@ -140,3 +142,19 @@ async def decide(proposal_id: str, body: Decision, db: DB, user: Teacher) -> dic
                     payload={"proposal": proposal_id, "approve": body.approve, "slot": result["slot"]}))
     await db.commit()
     return result
+
+
+@router.post("/student/assignments/{assignment_id}/dialogue/transcribe")
+async def transcribe(assignment_id: UUID, request: Request, db: DB, user: Student) -> dict[str, Any]:
+    """Speech to text for one phrase of the boss call: 16 kHz mono 16-bit PCM in, text out (offline Vosk)."""
+    await own_assignment(db, assignment_id, user.id)
+    audio = await request.body()
+    if not 0 < len(audio) <= 60 * 16000 * 2:
+        raise APIError(413, "VALIDATION_ERROR", "Фраза должна быть короче минуты.")
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            response = await client.post(f"{settings.stt_url.rstrip('/')}/transcribe", content=audio)
+            response.raise_for_status()
+    except httpx.HTTPError as error:
+        raise APIError(503, "STT_UNAVAILABLE", "Распознавание речи недоступно. Введите ответ текстом.") from error
+    return {"text": str(response.json().get("text", ""))}
