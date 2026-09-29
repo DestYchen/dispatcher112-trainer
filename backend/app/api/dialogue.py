@@ -1,7 +1,6 @@
 """Interactive boss call: the student speaks (or types) turns, the duty officer answers from the graph."""
 
 from datetime import UTC, datetime
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -13,6 +12,7 @@ from sqlalchemy import select
 from app.api.deps import DB, Student, Teacher
 from app.api.errors import APIError
 from app.db.models import AuditLog, DirectoryEntry, InteractionEvent, PhoneReport, Scenario
+from app.dialogue import learning
 from app.dialogue.engine import Card, Turn, load_graph, step
 from app.domain.cards import own_assignment
 from app.realtime.hub import hub
@@ -22,8 +22,8 @@ GRAPH_PATH = Path("/data/dialogue/boss_graph.json")
 MEDIA_ROOT = Path("/data/voices")
 
 
-@lru_cache(maxsize=1)
 def graph() -> dict[str, Any]:
+    # Small file, read per turn so teacher-approved changes apply to the very next call.
     return load_graph(GRAPH_PATH)
 
 
@@ -114,3 +114,29 @@ async def unmatched(db: DB, user: Teacher) -> dict[str, Any]:
             counts[key] = counts.get(key, 0) + 1
     items = sorted(counts.items(), key=lambda item: -item[1])
     return {"items": [{"utterance": u, "asked": a, "count": c} for (u, a), c in items]}
+
+
+class Decision(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    approve: bool
+    slot: str | None = Field(default=None, pattern="^(address|incident_type|victims|measures|none)$")
+    reply: str | None = Field(default=None, max_length=120)
+
+
+@router.get("/teacher/dialogue/proposals")
+async def proposals(user: Teacher) -> dict[str, Any]:
+    items = learning.read(learning.PROPOSALS, [])
+    return {"graph_version": load_graph(GRAPH_PATH).get("version", 1),
+            "items": sorted(items, key=lambda p: (p["status"] != "PENDING", -p.get("count", 0)))}
+
+
+@router.post("/teacher/dialogue/proposals/{proposal_id}")
+async def decide(proposal_id: str, body: Decision, db: DB, user: Teacher) -> dict[str, Any]:
+    try:
+        result = learning.decide(proposal_id, body.approve, body.slot, body.reply, user.login)
+    except KeyError as error:
+        raise APIError(404, "NOT_FOUND", "Предложение не найдено или уже рассмотрено.") from error
+    db.add(AuditLog(user_id=user.id, action="DIALOGUE_PROPOSAL_DECIDED", entity_type="dialogue",
+                    payload={"proposal": proposal_id, "approve": body.approve, "slot": result["slot"]}))
+    await db.commit()
+    return result

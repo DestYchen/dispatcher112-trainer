@@ -137,6 +137,7 @@ services:
       - ./backend:/app:ro
       - ./data:/data:ro
       - ./data/materials:/data/materials
+      - ./data/dialogue:/data/dialogue
       - ./data/telephony/speech:/data/telephony/speech
       - ./data/backup-operations/requests:/data/backup-operations/requests
       - ./data/feedback.jsonl:/data/feedback.jsonl

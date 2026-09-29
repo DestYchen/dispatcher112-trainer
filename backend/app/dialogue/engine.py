@@ -85,10 +85,15 @@ def stem(word: str) -> str:
     return re.sub(r"(ая|ой|ую|ую|ое|ий|ый|ом|ей|ых|их|ым|им|а|у|е|ы|и|я|ю)$", "", word)
 
 
+def similar(a: str, b: str) -> bool:
+    return SequenceMatcher(None, normalized(a).strip(" .!?"), normalized(b).strip(" .!?")).ratio() >= 0.85
+
+
 class KeywordRouter:
-    def __init__(self, card: Card) -> None:
+    def __init__(self, card: Card, examples: dict[str, list[str]] | None = None) -> None:
         self.card = card
         self.street = street_of(card.address)
+        self.examples = examples or {}
 
     def slots(self, utterance: str, slots: list[str]) -> set[str]:
         text = normalized(utterance)
@@ -102,12 +107,16 @@ class KeywordRouter:
             found.add("victims")
         if MEASURES.search(text):
             found.add("measures")
+        # Phrasings approved by the teacher after overnight learning.
+        for slot, phrases in self.examples.items():
+            if any(similar(text, phrase) for phrase in phrases):
+                found.add(slot)
         return found & set(slots)
 
 
 def step(graph: dict[str, Any], card: Card, turns: list[Turn], router: Router | None = None) -> Reply:
     """Decide the boss's next line from the whole conversation so far."""
-    router = router or KeywordRouter(card)
+    router = router or KeywordRouter(card, graph.get("examples"))
     slots: list[str] = graph["slots"]
     filled: set[str] = set()
     street = street_of(card.address)
@@ -136,6 +145,9 @@ def step(graph: dict[str, Any], card: Card, turns: list[Turn], router: Router | 
     if not missing or len(turns) >= graph.get("max_turns", 6):
         return Reply("done", nodes["done"]["text"], sorted(filled), True, extra={"missing": missing})
     if turns and unmatched:
+        talk = next((row for row in graph.get("smalltalk", []) if similar(turns[-1].utterance, row["utterance"])), None)
+        if talk:
+            return Reply("smalltalk", talk["reply"], sorted(filled), False)
         return Reply("not_understood", nodes["not_understood"]["text"], sorted(filled), False, unmatched=True)
     node = f"ask_{missing[0]}"
     return Reply(node, nodes[node]["text"], sorted(filled), False)
