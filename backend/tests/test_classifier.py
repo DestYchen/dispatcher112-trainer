@@ -22,7 +22,7 @@ def test_real_customer_classifier_parses() -> None:
     # data/classifier.xlsx is converted from the customer's ЕКП v046_24 (scripts/convert_real_classifier.py).
     # Parsed only: the shared test database keeps the synthetic fixture the other tests rely on.
     data = read_classifier(Path("/data/classifier.xlsx"))
-    assert (len(data["services"]), len(data["incident_groups"]), len(data["incident_types"])) == (58, 23, 1131)
+    assert (len(data["services"]), len(data["incident_groups"]), len(data["incident_types"])) == (230, 23, 1131)
     fire = next(row for row in data["incident_types"] if row["code"] == "1050901")
     assert fire["name"] == "пожар: частный дом"
     assert fire["attributes"] == {"level1": "жилой дом", "level2": "частный дом", "level3": "открытое пламя"}

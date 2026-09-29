@@ -54,7 +54,7 @@
 .serviceBar { position: sticky; bottom: 0; z-index: 5; background: var(--arm-orange); color: #fff; display: flex; align-items: stretch; gap: 8px; padding: 6px 8px; min-height: 58px; }
 .barLabel { align-self: center; font-weight: 600; }
 .serviceTabs { display: flex; flex-wrap: wrap; gap: 2px; flex: 1; align-items: stretch; }
-.serviceTab { background: rgba(255, 255, 255, 0.14); border-bottom: 2px solid #fff; padding: 6px 10px; font-weight: 600; display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.serviceTab { max-width: 260px; overflow: hidden; text-overflow: ellipsis; background: rgba(255, 255, 255, 0.14); border-bottom: 2px solid #fff; padding: 6px 10px; font-weight: 600; display: flex; gap: 6px; align-items: center; white-space: nowrap; }
 .serviceTab button { background: none; border: 0; color: #fff; cursor: pointer; }
 .add { background: none; border: 2px solid #fff; color: #fff; width: 42px; font-size: 22px; cursor: pointer; }
 .barActions { display: flex; gap: 6px; align-items: center; }

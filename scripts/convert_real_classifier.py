@@ -87,6 +87,33 @@ SERVICES: list[tuple[str, str, bool, list[int], dict[str, list[int]]]] = [
 ]
 
 
+# Directory entries (data/services_directory.txt, from «СЛУЖБЫ 112.docx») already covered by a
+# classifier service above; the rest are added as services the operator can add by hand.
+COVERED = {
+    "Служба 101", "Служба 102", "Служба 103", "Служба 104", "ФСБ", "ЦЭМП", "ЦОДД", "Гормост", "Мосгортранс",
+    "Автодороги", "Мосводоканал", "Россети МР", "МОЭК", "Деп. ЖКХ", "Метро", "ОЭК", "Мослифт", "Мосводосток",
+    "Москоллектор", "Воен. комендатура", "МЖД", "Канал им. Москвы", "МГТС", "Мособлгаз", "Центррегионводхоз",
+    "ОАТИ", "ГБУ МСППН", "ЭВАЖД", "Деп. Обр.", "Деп. труда и соц.защиты", "ФГУП РСВО", "Деп. природопользования",
+    "Департамент культуры города Москвы", "ГКУ ЦСА", "Мостуризм", "Департамент строительства",
+    "Комитет ветеринарии", "Мосжилинспекция", "Поселение ТиНАО",
+}
+
+
+def directory_services(path: Path) -> list[tuple[str, str]]:
+    """(short name, full name as shown in «Добавьте службы») for services not in the classifier."""
+    if not path.is_file():
+        return []
+    rows = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        short = line.split(" (", 1)[0].strip()
+        if short not in COVERED:
+            rows.append((short, line.replace(" …)", ")").replace("…", "")))
+    return rows
+
+
 def cell(row: tuple, index: int) -> str:
     value = row[index] if index < len(row) else None
     return "" if value is None else str(value).strip()
@@ -150,6 +177,9 @@ def convert(source: Path, target: Path) -> dict[str, int]:
     sheet.append(["code", "name", "short_name", "is_visible", "sort_order"])
     for i, (code_, name, visible, _, _) in enumerate(SERVICES):
         sheet.append([code_, name, name.split(" (")[0][:64], visible, i])
+    extra = directory_services(Path(__file__).resolve().parents[1] / "data" / "services_directory.txt")
+    for j, (short, full) in enumerate(extra, 1):
+        sheet.append([f"DIR_{j:03}", full[:255], short[:64], True, len(SERVICES) + j])
     sheet = workbook.create_sheet("incident_groups")
     sheet.append(["code", "name", "sort_order"])
     for i, (code_, name) in enumerate(groups):
@@ -164,7 +194,7 @@ def convert(source: Path, target: Path) -> dict[str, int]:
         for code_ in sorted(codes):
             sheet.append([modifier, code_])
     workbook.save(target)
-    return {"groups": len(groups), "types": len(types), "services": len(SERVICES),
+    return {"groups": len(groups), "types": len(types), "services": len(SERVICES) + len(extra),
             "skipped_duplicate_tags": duplicates, "types": len(types)}
 
 
