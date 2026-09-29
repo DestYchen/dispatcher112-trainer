@@ -130,6 +130,8 @@ def convert(source: Path, target: Path) -> dict[str, int]:
             continue
         seen_attrs[key] = code
         services = [code_ for code_, _, _, base, _ in SERVICES if any(cell(row, i) for i in base)]
+        if not services:
+            continue  # nobody is notified: nothing for a dispatcher to train on
         visible = sum(1 for code_, _, shown, _, _ in SERVICES if shown and code_ in services)
         types.append([code, group_code, final[:500], key, difficulty(len(attrs), visible, group_name),
                       ",".join(services)])
@@ -163,7 +165,7 @@ def convert(source: Path, target: Path) -> dict[str, int]:
             sheet.append([modifier, code_])
     workbook.save(target)
     return {"groups": len(groups), "types": len(types), "services": len(SERVICES),
-            "skipped_duplicate_tags": duplicates, "types_without_services": sum(1 for t in types if not t[5])}
+            "skipped_duplicate_tags": duplicates, "types": len(types)}
 
 
 if __name__ == "__main__":
