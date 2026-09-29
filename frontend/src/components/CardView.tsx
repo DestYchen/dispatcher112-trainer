@@ -6,6 +6,7 @@ import {
   type LessonSettings,
 } from "../lib/cardTypes";
 import styles from "./Workspace.module.css";
+import arm from "./Arm.module.css";
 
 export function DeadlineBar({
   seconds,
@@ -54,154 +55,154 @@ export function CardView({
       detail.entry?.accepted_delay_ms != null);
   const primary = remaining(timers.primary_deadline_at, now);
   const processing = remaining(timers.processing_deadline_at, now);
+  const own = card.notification_list.find((service) => service.is_own);
+  const has = (code: string) => card.modifiers.some((modifier) => modifier.code === code);
+  const statusText = (service: (typeof card.notification_list)[number]) =>
+    service.last_status
+      ? `${new Date(service.last_status.at).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })} ${
+          strings.statusLabels[service.last_status.status as keyof typeof strings.statusLabels] ?? service.last_status.status
+        }`
+      : strings.noStatus;
+  const flagged = has("VICTIMS") || has("FATALITIES");
+  // Laid out like the saved card on the ДДС АРМ-112 (memo «Работа на АРМ-112», pp. 23-24).
   return (
-    <article className={styles.card} aria-label={card.card_number}>
-      <header className={styles.cardHeader}>
-        <div>
-          <p className={styles.metadata}>{strings.incidentCard}</p>
-          <h1 className={styles.number}>{card.card_number}</h1>
-        </div>
-        <div>
-          <p className={styles.metadata}>
-            {new Date(card.registered_at).toLocaleString("ru-RU")}
-          </p>
-          {card.origin !== "EXTERNAL_SYSTEM" && (
-            <p className={styles.metadata}>
-              {strings.operator} {card.operator_workstation}
-            </p>
-          )}
-        </div>
-      </header>
-      <div className={styles.timerArea}>
-        <div>
-          <div
-            className={`${styles.timer} ${(primary ?? 1) < 0 && !primarySet ? styles.alarm : ""}`}
-            data-testid="primary-timer"
-          >
-            {primarySet ? "✓" : countdown(primary)}
+    <article className={`${styles.card} ${arm.saved}`} aria-label={card.card_number}>
+      <div className={arm.savedHead}>
+        <div className={arm.hangup} aria-hidden>
+          <span>☎</span>
+          <div>
+            <small>не подключен</small>
+            <span className={arm.fakeButtons}>
+              <span>записи звонков</span>
+              <span>список SMS</span>
+            </span>
           </div>
-          <p className={styles.metadata}>
-            {primarySet
-              ? detail.task_mode === "CARD_ENTRY"
-                ? strings.incomingAccepted
-                : strings.primarySet
-              : strings.primaryTimer}
-          </p>
-          {!primarySet && (
-            <DeadlineBar
-              seconds={primary}
-              total={settings.primary_status_deadline_sec}
-            />
-          )}
         </div>
-        <div>
-          <div
-            className={`${styles.timer} ${(processing ?? 1) < 0 ? styles.alarm : ""}`}
-            data-testid="processing-timer"
-          >
-            {detail.state === "CLOSED" ? "✓" : countdown(processing)}
-          </div>
-          <p className={styles.metadata}>
-            {detail.state === "CLOSED"
-              ? strings.cardClosed
-              : strings.processingTimer}
-          </p>
-          {detail.state !== "CLOSED" && (
-            <DeadlineBar
-              seconds={processing}
-              total={settings.card_processing_deadline_sec}
-              label={strings.processingTimer}
-            />
-          )}
+        <div className={arm.phone}>
+          <span>АОН</span>
+          <strong>{card.applicant.phone || "+7 (   )   -  -"}</strong>
+        </div>
+        <div className={arm.phone}>
+          <span>предоставленный</span>
+          <strong>{card.applicant.phone || "+7 (   )   -  -"}</strong>
+        </div>
+        <div className={arm.phone}>
+          <span>телефон на место</span>
+          <strong />
+        </div>
+        <div className={arm.number}>
+          <strong>Происшествие {card.card_number}</strong>
+          <span>
+            Сохр. {new Date(card.registered_at).toLocaleString("ru-RU")}
+            {card.origin !== "EXTERNAL_SYSTEM" && card.operator_workstation
+              ? ` · ${strings.operator} ${card.operator_workstation}`
+              : ""}
+          </span>
+        </div>
+        <div
+          className={`${arm.clock} ${!primarySet && (primary ?? 1) < 0 ? arm.late : ""}`}
+          data-testid="primary-timer"
+          title={`${strings.processingTimer}: ${countdown(processing)}`}
+        >
+          <b>{primarySet ? "✓" : countdown(primary)}</b>
+          <small>
+            <span>
+              {primarySet
+                ? detail.task_mode === "CARD_ENTRY"
+                  ? strings.incomingAccepted
+                  : strings.primarySet
+                : "до первичного статуса"}
+            </span>
+          </small>
         </div>
       </div>
-      <div className={styles.cardBody}>
-        <div>
-          <section className={styles.section}>
-            <h2>{strings.applicant}</h2>
-            <dl className={styles.fieldList}>
-              <div>
-                <dt>{strings.applicantName}</dt>
-                <dd>{card.applicant.name || strings.notSpecified}</dd>
-              </div>
-              <div>
-                <dt>{strings.applicantPhone}</dt>
-                <dd>{card.applicant.phone || strings.notSpecified}</dd>
-              </div>
-            </dl>
+      <p className={arm.processing} data-testid="processing-timer">
+        {detail.state === "CLOSED"
+          ? `✓ ${strings.cardClosed}`
+          : `${strings.processingTimer}: ${countdown(processing)}`}
+      </p>
+      <div className={arm.savedBody}>
+        <div className={arm.left}>
+          <div className={arm.panel}>
+            <strong>{card.applicant.name || strings.notSpecified}</strong>
             <Hint kind="applicant" enabled={settings.hints_enabled} />
-          </section>
-          <section className={styles.section}>
-            <h2>{strings.address}</h2>
-            <p className={styles.description}>{card.address.raw}</p>
-            {card.address.clarification && (
-              <p className={styles.metadata}>
-                <em>{card.address.clarification}</em>
-              </p>
-            )}
+          </div>
+          <div className={`${arm.panel} ${arm.addressRow}`}>
+            <strong>{card.address.raw}</strong>
+            <span aria-hidden title="Карта">🗺</span>
+            {card.address.clarification && <em>{card.address.clarification}</em>}
             <Hint kind="address" enabled={settings.hints_enabled} />
-          </section>
-          <section className={styles.section}>
-            <h2>{strings.description}</h2>
+          </div>
+          <div className={`${arm.panel} ${arm.grow}`}>
+            <span className={arm.label}>Описание со слов заявителя</span>
             <p className={styles.description}>{card.description}</p>
             <Hint kind="description" enabled={settings.hints_enabled} />
-          </section>
+          </div>
         </div>
-        <div>
-          <section className={styles.section}>
-            <h2>{strings.incidentType}</h2>
-            <p className={styles.description}>
-              <strong>{card.incident_type_name}</strong>
-            </p>
-          </section>
-          <section className={styles.section}>
-            {card.origin === "EXTERNAL_SYSTEM" ? (
+        <div className={arm.right}>
+          <div className={arm.flags}>
+            <span>
+              Пострадавшие: <b className={flagged ? arm.yes : undefined}>{flagged ? "да" : "нет"}</b>
+            </span>
+            <span>
+              Угроза людям:{" "}
+              <b className={has("THREAT_TO_PEOPLE") ? arm.yes : undefined}>{has("THREAT_TO_PEOPLE") ? "да" : "нет"}</b>
+            </span>
+            <span>
+              Заблокированные:{" "}
+              <b className={has("NO_ACCESS") ? arm.yes : undefined}>{has("NO_ACCESS") ? "да" : "нет"}</b>
+            </span>
+          </div>
+          <div className={arm.incidentHead}>
+            <span>{card.incident_type_name}</span>
+          </div>
+          {card.origin === "EXTERNAL_SYSTEM" ? (
+            <div className={arm.panel}>
               <p className={styles.readonly}>{strings.externalCard}</p>
-            ) : (
-              <>
-                <h2>{strings.attributes}</h2>
-                <div className={styles.tags}>
-                  {card.attributes.map((attribute, index) => (
-                    <span className={styles.tag} key={index}>
-                      {attribute}
-                    </span>
-                  ))}
-                </div>
-                <Hint kind="attributes" enabled={settings.hints_enabled} />
-              </>
-            )}
-            {card.modifiers.map((modifier) => (
+            </div>
+          ) : (
+            <div className={arm.panel}>
+              <strong>
+                {card.attributes.join(". ")}
+                {card.attributes.length ? "." : ""}
+              </strong>
+              <Hint kind="attributes" enabled={settings.hints_enabled} />
+            </div>
+          )}
+          <div className={arm.panel}>
+            <span>
+              Класс.: <strong>{card.incident_type_name};</strong>
+            </span>
+          </div>
+          {card.modifiers
+            .filter((m) => !["VICTIMS", "FATALITIES", "THREAT_TO_PEOPLE", "NO_ACCESS"].includes(m.code))
+            .map((modifier) => (
               <p className={styles.alarm} key={modifier.code}>
                 ⚠ {modifier.label}
               </p>
             ))}
-          </section>
         </div>
       </div>
-      <section className={`${styles.section} ${styles.dispatchSection}`}>
-        <h2>{strings.notifications}</h2>
-        <div className={styles.dispatchList}>
-          {[...card.notification_list]
-            .sort((a, b) => Number(b.is_own) - Number(a.is_own))
+      <div className={arm.darkBar} aria-label={strings.notifications}>
+        <span className={arm.barLabel}>Службы:</span>
+        <div className={arm.serviceTabs}>
+          {own && (
+            <span className={`${arm.darkTab} ${arm.ownTab}`} title={`${own.service_name} — ${strings.ownService}`}>
+              <strong>{own.service_name}</strong>
+              <small>{statusText(own)}</small>
+            </span>
+          )}
+          {card.notification_list
+            .filter((service) => !service.is_own)
             .map((service) => (
-              <div
-                key={service.service_code}
-                className={service.is_own ? styles.own : styles.notification}
-              >
-                <strong>
-                  {service.service_name}
-                  {service.is_own && ` — ${strings.ownService}`}
-                </strong>
-                <p className={styles.metadata}>
-                  {service.last_status
-                    ? `${strings.statusLabels[service.last_status.status as keyof typeof strings.statusLabels] ?? service.last_status.status} · ${new Date(service.last_status.at).toLocaleTimeString("ru-RU")} · ${service.last_status.by}`
-                    : strings.noStatus}
-                </p>
-              </div>
+              <span className={arm.darkTab} key={service.service_code} title={service.service_name}>
+                <strong>{service.service_name}</strong>
+                <small>{statusText(service)}</small>
+              </span>
             ))}
         </div>
-        <Hint kind="notifications" enabled={settings.hints_enabled} />
-      </section>
+      </div>
+      <Hint kind="notifications" enabled={settings.hints_enabled} />
     </article>
   );
 }

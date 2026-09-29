@@ -34,7 +34,7 @@
 .addressGrid label { display: grid; }
 .addressGrid span { font-size: 11px; color: #7a7f85; }
 .wide { grid-column: 1 / -1; }
-.grow { min-height: 180px; }
+.grow { min-height: 180px; align-content: start; }
 .counter { justify-self: end; font-size: 11px; color: #666; }
 
 .modifiers { display: flex; flex-wrap: wrap; gap: 4px; background: var(--arm-panel); border: 1px solid var(--arm-line); padding: 6px; }
@@ -76,3 +76,27 @@
   .columns, .phones, .head { grid-template-columns: 1fr; }
   .question { grid-template-columns: 1fr; gap: 4px; }
 }
+
+/* Saved card on the ДДС АРМ-112 (memo pp. 23-24) */
+.saved { --arm-bg: #e3e5e8; --arm-panel: #f4f5f6; --arm-line: #c9cdd2; --arm-red: #e8141b; --arm-text: #2b2f33;
+  background: var(--arm-bg); color: var(--arm-text); font-size: 14px; display: grid; gap: 6px; padding: 6px; }
+.savedHead { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)) auto auto; gap: 6px; }
+.hangup { background: var(--arm-panel); border: 1px solid var(--arm-line); display: flex; gap: 8px; align-items: center; padding: 4px 10px; }
+.hangup > span { font-size: 22px; transform: rotate(135deg); }
+.hangup small { color: #555; }
+.fakeButtons { display: flex; gap: 4px; }
+.fakeButtons span { border: 1px solid var(--arm-line); background: #fff; font-size: 10px; padding: 1px 6px; color: #777; }
+.saved .phone strong { font-size: 18px; font-weight: 400; min-height: 22px; }
+.processing { margin: 0; font-size: 12px; color: #555; }
+.savedBody { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 6px; }
+.addressRow { grid-template-columns: minmax(0, 1fr) auto; }
+.addressRow em { grid-column: 1 / -1; color: #555; }
+.flags { background: var(--arm-panel); border: 1px solid var(--arm-line); display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 10px; }
+.yes { color: var(--arm-red); }
+.darkBar { background: #4a5057; color: #fff; display: flex; gap: 8px; align-items: stretch; padding: 0 8px; min-height: 58px; }
+.darkBar .barLabel { align-self: center; }
+.darkTab { display: grid; align-content: center; padding: 6px 12px; border-left: 1px solid #6a7179; max-width: 220px; }
+.darkTab strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.darkTab small { font-size: 11px; color: #d8dce0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ownTab { background: #1a74c4; }
+@media (max-width: 900px) { .savedHead, .savedBody { grid-template-columns: 1fr; } }
