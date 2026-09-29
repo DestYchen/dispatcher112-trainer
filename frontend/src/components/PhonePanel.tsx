@@ -8,6 +8,7 @@ import { enqueue, flushActions, readActions } from "../lib/offline";
 import { useServerNow } from "../lib/realtime";
 import { strings } from "../lib/strings";
 import { AsyncView } from "./AsyncView";
+import { BossDialogue } from "./BossDialogue";
 import { CommentInput } from "./CommentInput";
 import common from "./Common.module.css";
 import styles from "./Phone.module.css";
@@ -282,6 +283,20 @@ export function PhonePanel({
               Отменить неотвеченный вызов
             </button>
           )}
+          {!draft.call.dial_uri ? (
+            <BossDialogue
+              assignmentId={assignmentId}
+              callId={draft.call.call_id}
+              calleeTitle={draft.call.callee.title}
+              greeting={draft.call.greeting_text}
+              play={play}
+              onFinished={(text) => {
+                persist({ call: null, text: "" });
+                setConfirmation(text);
+              }}
+            />
+          ) : (
+          <>
           <p className={styles.phrase}>«{draft.call.greeting_text}»</p>
           <form
             className={common.form}
@@ -329,6 +344,8 @@ export function PhonePanel({
               </button>
             )}
           </form>
+          </>
+          )}
         </>
       ) : (
         <>
