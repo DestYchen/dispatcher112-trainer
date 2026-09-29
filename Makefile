@@ -20,6 +20,8 @@ migrate: bootstrap
 
 seed: bootstrap
 	$(COMPOSE) run --rm backend python -m app.seeds.import_classifier
+	$(COMPOSE) run --rm backend python -m app.seeds.create_demo_users
+	$(COMPOSE) run --rm backend python -m app.seeds.import_real_tickets
 	$(COMPOSE) run --rm backend python -m app.seeds.import_streets
 	$(COMPOSE) run --rm backend python -m app.seeds.create_demo_users
 	$(COMPOSE) run --rm backend python -m app.seeds.manual_scenarios
