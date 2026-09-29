@@ -10,6 +10,7 @@ build: bootstrap
 	$(COMPOSE) build
 
 up: bootstrap
+	"$(PYTHON)" scripts/prepare_stt.py
 	$(COMPOSE) up --build --detach --wait --wait-timeout 240
 
 down:
@@ -23,7 +24,6 @@ seed: bootstrap
 	$(COMPOSE) run --rm backend python -m app.seeds.create_demo_users
 	$(COMPOSE) run --rm backend python -m app.seeds.import_real_tickets
 	$(COMPOSE) run --rm backend python -m app.seeds.import_streets
-	$(COMPOSE) run --rm backend python -m app.seeds.create_demo_users
 	$(COMPOSE) run --rm backend python -m app.seeds.manual_scenarios
 	$(COMPOSE) run --rm backend python -m app.seeds.directory
 
@@ -32,6 +32,7 @@ voices:
 
 models:
 	"$(PYTHON)" scripts/prepare_models.py
+	"$(PYTHON)" scripts/prepare_stt.py
 
 technical-status:
 	"$(PYTHON)" scripts/technical_operations.py collect
