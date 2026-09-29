@@ -506,3 +506,15 @@
   min-height: var(--control-h);
   min-width: var(--control-h);
 }
+
+/* Student queue styled like the АРМ-112 «Список происшествий» grid (memo p. 12). */
+.queue { background: #7d858e; }
+.queue .sectionTitle { background: #5d646c; color: #fff; border-bottom-color: #4a5057; }
+.queue > section > p { color: #fff; background: transparent; }
+.queueItem { background: #3a3f45; color: #fff; border-bottom: 3px solid #7d858e; }
+.queueItem:hover { background: #454b52; }
+.queueItem > span:nth-of-type(2) { font-weight: 700; font-size: 1.05em; }
+.queueItem .metadata { color: #c9ced3; }
+.queueItem .alarm { color: #fff; background: #e8141b; align-self: flex-start; padding: 0 6px; font-size: 0.85em; }
+.queue .selected { background: #1a74c4; box-shadow: none; }
+.queue .new { animation: none; outline: 2px solid #ec6a3d; outline-offset: -2px; }
