@@ -3,7 +3,7 @@ import {
   type LessonSummary as Lesson,
 } from "./components/LessonList";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { allItems, api } from "./api/client";
 import { AsyncView } from "./components/AsyncView";
 import { learningStrings as learning, strings } from "./lib/strings";
@@ -125,6 +125,39 @@ export function TeacherHome() {
         "/teacher/modules",
       ),
   });
+  const panelOpen = !!(preparing || reportLesson || liveLesson);
+  const closePanel = () => {
+    setPreparing(null);
+    setReportLesson(null);
+    setLiveLesson(null);
+  };
+  // A lesson console, report or preparation is its own screen; the browser Back button returns to the list.
+  useEffect(() => {
+    if (!panelOpen) return;
+    window.scrollTo(0, 0);
+    window.history.pushState({ teacherPanel: true }, "");
+    const back = () => closePanel();
+    window.addEventListener("popstate", back);
+    return () => window.removeEventListener("popstate", back);
+  }, [panelOpen]);
+  if (panelOpen)
+    return (
+      <section className={common.page}>
+        <div className={common.toolbar}>
+          <button onClick={() => window.history.back()}>← К списку занятий</button>
+        </div>
+        {preparing && <Preparation key={preparing} lessonId={preparing} />}
+        {reportLesson && <TeacherReport key={reportLesson} lessonId={reportLesson} />}
+        {liveLesson && (
+          <TeacherLive
+            key={liveLesson.id}
+            lessonId={liveLesson.id}
+            title={liveLesson.title}
+            refreshLessons={() => lessons.refetch()}
+          />
+        )}
+      </section>
+    );
   return (
     <section className={common.page}>
       <header className={common.pageHeading}>
@@ -133,31 +166,6 @@ export function TeacherHome() {
           <p>{strings.teacherIntro}</p>
         </div>
       </header>
-      {(preparing || reportLesson || liveLesson) && (
-        <div className={common.toolbar}>
-          <button
-            onClick={() => {
-              setPreparing(null);
-              setReportLesson(null);
-              setLiveLesson(null);
-            }}
-          >
-            {strings.closePanel}
-          </button>
-        </div>
-      )}
-      {preparing && <Preparation key={preparing} lessonId={preparing} />}
-      {reportLesson && (
-        <TeacherReport key={reportLesson} lessonId={reportLesson} />
-      )}
-      {liveLesson && (
-        <TeacherLive
-          key={liveLesson.id}
-          lessonId={liveLesson.id}
-          title={liveLesson.title}
-          refreshLessons={() => lessons.refetch()}
-        />
-      )}
       <details className={common.formPanel}>
         <summary>{strings.newLesson}</summary>
         <AsyncView

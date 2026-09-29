@@ -68,16 +68,6 @@ export function CardView({
   return (
     <article className={`${styles.card} ${arm.saved}`} aria-label={card.card_number}>
       <div className={arm.savedHead}>
-        <div className={arm.hangup} aria-hidden>
-          <span>☎</span>
-          <div>
-            <small>не подключен</small>
-            <span className={arm.fakeButtons}>
-              <span>записи звонков</span>
-              <span>список SMS</span>
-            </span>
-          </div>
-        </div>
         <div className={arm.phone}>
           <span>АОН</span>
           <strong>{card.applicant.phone || "+7 (   )   -  -"}</strong>
@@ -85,10 +75,6 @@ export function CardView({
         <div className={arm.phone}>
           <span>предоставленный</span>
           <strong>{card.applicant.phone || "+7 (   )   -  -"}</strong>
-        </div>
-        <div className={arm.phone}>
-          <span>телефон на место</span>
-          <strong />
         </div>
         <div className={arm.number}>
           <strong>Происшествие {card.card_number}</strong>
@@ -129,7 +115,6 @@ export function CardView({
           </div>
           <div className={`${arm.panel} ${arm.addressRow}`}>
             <strong>{card.address.raw}</strong>
-            <span aria-hidden title="Карта">🗺</span>
             {card.address.clarification && <em>{card.address.clarification}</em>}
             <Hint kind="address" enabled={settings.hints_enabled} />
           </div>

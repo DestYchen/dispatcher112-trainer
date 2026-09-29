@@ -185,10 +185,6 @@ export function ArmEntryEditor({
           <span>предоставленный</span>
           <input disabled placeholder="+7 (   )   -  -" value={card.applicant.phone} readOnly />
         </label>
-        <label className={styles.phone}>
-          <span>телефон на место</span>
-          <input disabled placeholder="+7 (   )   -  -" readOnly />
-        </label>
       </div>
 
       <div className={styles.columns}>

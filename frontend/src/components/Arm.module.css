@@ -16,7 +16,7 @@
 .clock b { font: 700 34px/1 "Roboto Mono", ui-monospace, monospace; letter-spacing: 1px; }
 .clock small { display: flex; justify-content: space-between; width: 100%; font-size: 10px; }
 
-.phones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.phones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .phone { background: var(--arm-panel); border: 1px solid var(--arm-line); padding: 4px 10px; display: grid; }
 .phone span { font-size: 11px; color: #666; }
 .phone input { border: 0; border-bottom: 1px solid var(--arm-line); background: transparent; font-size: 18px; padding: 2px 0; }
@@ -80,7 +80,7 @@
 /* Saved card on the ДДС АРМ-112 (memo pp. 23-24) */
 .saved { --arm-bg: #e3e5e8; --arm-panel: #f4f5f6; --arm-line: #c9cdd2; --arm-red: #e8141b; --arm-text: #2b2f33;
   background: var(--arm-bg); color: var(--arm-text); font-size: 14px; display: grid; gap: 6px; padding: 6px; }
-.savedHead { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)) auto auto; gap: 6px; }
+.savedHead { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto auto; gap: 6px; }
 .hangup { background: var(--arm-panel); border: 1px solid var(--arm-line); display: flex; gap: 8px; align-items: center; padding: 4px 10px; }
 .hangup > span { font-size: 22px; transform: rotate(135deg); }
 .hangup small { color: #555; }
