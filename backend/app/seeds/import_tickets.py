@@ -205,7 +205,7 @@ async def import_tickets(db: AsyncSession, source: Path) -> dict[str, int]:
             difficulty=incident.difficulty,
             author_id=teacher.id,
             card_payload=payload,
-            reference=build_reference(payload["notified_services"], "DDS_CHERTANOVO"),
+            reference=build_reference(payload["notified_services"], "DDS_DISTRICT" if "DDS_DISTRICT" in payload["notified_services"] else "DDS_CHERTANOVO"),
         )
         db.add(row)
         await db.flush()

@@ -33,7 +33,7 @@ EXERCISES: tuple[tuple[str, Literal["CARD_ACTIONS", "CARD_ENTRY"]], ...] = (
 
 async def prepare_showcase(db: AsyncSession) -> dict[str, Any]:
     await db.execute(text("SELECT pg_advisory_xact_lock(112170)"))
-    service = await db.scalar(select(Service).where(Service.code == "DDS_CHERTANOVO"))
+    service = await db.scalar(select(Service).where(Service.code.in_(("DDS_CHERTANOVO", "DDS_DISTRICT"))).order_by(Service.code).limit(1))
     incident = await db.scalar(select(IncidentType).where(IncidentType.code.in_(("01.01.01", "1050901"))).order_by(IncidentType.code).limit(1))
     if service is None or incident is None:
         raise ValueError("Для показа сначала загрузите учебный классификатор из комплекта.")

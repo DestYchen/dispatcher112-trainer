@@ -9,7 +9,7 @@ from app.domain.security import password_hasher
 
 
 async def create_demo_users(session: AsyncSession) -> None:
-    service = (await session.scalars(select(Service).where(Service.code == "DDS_CHERTANOVO"))).one()
+    service = (await session.scalars(select(Service).where(Service.code.in_(("DDS_CHERTANOVO", "DDS_DISTRICT"))).order_by(Service.code).limit(1))).one()
     for login, password, role, last_name in [
         ("admin", "admin", "ADMIN", "Администратор"),
         ("teacher", "teacher", "TEACHER", "Преподаватель"),
