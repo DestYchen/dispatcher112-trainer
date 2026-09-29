@@ -8,6 +8,7 @@ import { api } from "./api/client";
 import { AsyncView } from "./components/AsyncView";
 import { Student } from "./Student";
 import { TeacherHome } from "./Teacher";
+import { TeacherInsights } from "./TeacherInsights";
 import { Login } from "./Login";
 import { SipConsole } from "./components/SipConsole";
 import { Learning } from "./Learning";
@@ -90,6 +91,11 @@ export function App() {
             <NavLink className={common.navLink} to="/learning">
               {learningStrings.learning}
             </NavLink>
+            {auth.user.role === "TEACHER" && (
+              <NavLink className={common.navLink} to="/insights">
+                Прогресс и ИИ
+              </NavLink>
+            )}
           </nav>
           <SipConsole key={auth.user.id} />
         </div>
@@ -118,6 +124,16 @@ export function App() {
                         <Navigate replace to="/admin" />
                       ) : (
                         <Learning />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/insights"
+                    element={
+                      auth.user.role === "TEACHER" ? (
+                        <TeacherInsights />
+                      ) : (
+                        <Navigate replace to={routeByRole[auth.user.role]} />
                       )
                     }
                   />
