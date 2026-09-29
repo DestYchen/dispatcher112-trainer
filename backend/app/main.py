@@ -26,6 +26,7 @@ from app.api.admin_users import router as admin_users_router
 from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
 from app.api.card_entry import router as card_entry_router
+from app.api.elo import router as elo_router
 from app.api.errors import APIError, handle_api_error
 from app.api.generation import router as generation_router
 from app.api.history import router as history_router
@@ -113,6 +114,7 @@ app.include_router(card_entry_router, prefix="/api/v1")
 app.include_router(phone_router, prefix="/api/v1")
 app.include_router(sip_router, prefix="/api/v1")
 app.include_router(learning_router, prefix="/api/v1")
+app.include_router(elo_router, prefix="/api/v1")
 app.include_router(history_router, prefix="/api/v1")
 app.include_router(analytics_router, prefix="/api/v1")
 app.include_router(reports_router, prefix="/api/v1")
