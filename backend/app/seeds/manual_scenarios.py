@@ -13,7 +13,7 @@ from app.domain.classifier import resolve_services
 
 async def manual_scenarios(db: AsyncSession) -> None:
     teacher = (await db.scalars(select(User).where(User.login == "teacher"))).one()
-    incident = (await db.scalars(select(IncidentType).where(IncidentType.code == "01.01.01"))).one()
+    incident = (await db.scalars(select(IncidentType).where(IncidentType.code.in_(("01.01.01", "1050901"))).order_by(IncidentType.code).limit(1))).one()
     fixtures = [
         (
             "Учебный пожар: доклад дежурному",
