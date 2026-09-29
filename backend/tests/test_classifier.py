@@ -14,13 +14,24 @@ from app.domain.classifier import (
     street_candidates,
 )
 from app.seeds.create_demo_users import create_demo_users
-from app.seeds.import_classifier import import_classifier
+from app.seeds.import_classifier import import_classifier, read_classifier
 from app.seeds.import_streets import import_streets
+
+
+def test_real_customer_classifier_parses() -> None:
+    # data/classifier.xlsx is converted from the customer's ЕКП v046_24 (scripts/convert_real_classifier.py).
+    # Parsed only: the shared test database keeps the synthetic fixture the other tests rely on.
+    data = read_classifier(Path("/data/classifier.xlsx"))
+    assert (len(data["services"]), len(data["incident_groups"]), len(data["incident_types"])) == (58, 23, 1131)
+    fire = next(row for row in data["incident_types"] if row["code"] == "1050901")
+    assert fire["name"] == "пожар: частный дом"
+    assert fire["attributes"] == {"level1": "жилой дом", "level2": "частный дом", "level3": "открытое пламя"}
+    assert "S101" in fire["services"]
 
 
 async def test_import_counts_and_idempotence(db: AsyncSession) -> None:
     for _ in range(2):
-        counts = await import_classifier(db, Path("/data/classifier.xlsx"))
+        counts = await import_classifier(db, Path("/data/classifier-synthetic.xlsx"))
         await import_streets(db, Path("/data/streets.csv"))
         await create_demo_users(db)
         assert counts == {"services": 58, "incident_groups": 24, "incident_types": 1200}

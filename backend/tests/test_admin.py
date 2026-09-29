@@ -149,7 +149,7 @@ async def test_imports_are_atomic_idempotent_and_audited_by_actor(
             )
         ).status_code == 200
     assert await db.scalar(select(func.count()).select_from(Street)) == before + 1
-    content = await asyncio.to_thread(Path("/data/classifier.xlsx").read_bytes)
+    content = await asyncio.to_thread(Path("/data/classifier-synthetic.xlsx").read_bytes)
     imported = await client.post(
         "/api/v1/admin/classifier/import", files={"file": ("classifier.xlsx", content)}
     )

@@ -50,6 +50,17 @@ def normalized(value: Any, field: str) -> Any:
     return " ".join(re.findall(r"\w+", text))
 
 
+ADDRESS_STOPWORDS = {
+    "москва", "г", "город", "ул", "улица", "д", "дом", "корп", "корпус", "к", "стр", "строение",
+    "под", "подъезд", "эт", "этаж", "код", "кв", "квартира",
+}
+
+
+def address_tokens(*parts: Any) -> set[str]:
+    text = " ".join(str(part or "") for part in parts).casefold().replace("ё", "е")
+    return {word for word in re.findall(r"\w+", text) if word not in ADDRESS_STOPWORDS}
+
+
 def compare_fields(
     answer: dict[str, Any], expected: dict[str, Any], description_keywords: list[str]
 ) -> list[dict[str, Any]]:
@@ -63,6 +74,13 @@ def compare_fields(
             target = target.get(part) if isinstance(target, dict) else None
         value, reference = normalized(actual, field), normalized(target, field)
         correct = value == reference
+        if field.startswith("address.") and value:
+            # Order and wording of the address do not matter; every street word and number of the
+            # reference must be present somewhere in the entered address. A look-alike street
+            # (Дубининская for Дубнинская) or a wrong house number still fails.
+            wanted = address_tokens(target)
+            given = address_tokens(*(answer.get("address") or {}).values())
+            correct = wanted <= given if wanted else correct
         if field == "description" and description_keywords:
             correct = all(
                 re.search(r"(?<!\w)" + re.escape(normalized(word, field)) + r"(?!\w)", value)

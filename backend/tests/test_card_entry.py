@@ -42,6 +42,14 @@ def test_entry_comparison_is_deterministic_and_normalizes_typography() -> None:
     assert all(compare_fields(answer, expected, []) == result for _ in range(100))
 
 
+def test_address_split_across_fields_in_any_order_is_correct() -> None:
+    expected = reference_card()
+    answer = deepcopy(expected)
+    answer["address"] = {"raw": "Москва, Дубнинская, д. 28", "clarification": "подъезд 1; двор"}
+    rows = {row["field"]: row for row in compare_fields(answer, expected, [])}
+    assert rows["address.raw"]["correct"] and rows["address.clarification"]["correct"]
+
+
 @pytest.mark.parametrize(
     "field",
     [

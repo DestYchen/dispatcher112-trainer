@@ -50,7 +50,7 @@ def prepared_database() -> Iterator[None]:
             await grant_runtime_access(connection, os.environ["APP_DB_PASSWORD"])
             await grant_backup_access(connection, os.environ["BACKUP_DB_PASSWORD"])
         async with AsyncSession(engine) as session, session.begin():
-            await import_classifier(session, Path("/data/classifier.xlsx"))
+            await import_classifier(session, Path("/data/classifier-synthetic.xlsx"))
             await import_streets(session, Path("/data/streets.csv"))
             await create_demo_users(session)
             await seed_directory(session)

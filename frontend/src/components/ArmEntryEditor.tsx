@@ -13,6 +13,36 @@ type Directory = {
 const LEVELS = ["level1", "level2", "level3"] as const;
 const LEVEL_TITLES = ["Признак", "Уточнение", "Характер"];
 
+/** Address parts <-> the two stored strings. Grading only needs every word and number present. */
+type AddressParts = { street: string; house: string; korpus: string; entrance: string; floor: string; code: string; note: string };
+const PART_RE: Record<"house" | "korpus", RegExp> = { house: /,\s*д\.\s*([^,]+)/, korpus: /,\s*корп\.\s*([^,]+)/ };
+const CLAR_RE: Record<"entrance" | "floor" | "code", RegExp> = {
+  entrance: /подъезд\s+([^,;]+)/,
+  floor: /этаж\s+([^,;]+)/,
+  code: /код\s+([^,;]+)/,
+};
+function parseAddress(raw: string, clarification: string): AddressParts {
+  const street = raw.replace(/^Москва,\s*/, "").replace(/,\s*(д|корп)\.\s*[^,]+/g, "").trim();
+  const pick = (re: RegExp, text: string) => text.match(re)?.[1]?.trim() ?? "";
+  const tagged = /^(подъезд|этаж|код)\s/;
+  const note = clarification.includes(";")
+    ? clarification.slice(clarification.indexOf(";") + 1).trim()
+    : tagged.test(clarification) ? "" : clarification;
+  return {
+    street, house: pick(PART_RE.house, raw), korpus: pick(PART_RE.korpus, raw),
+    entrance: pick(CLAR_RE.entrance, clarification), floor: pick(CLAR_RE.floor, clarification),
+    code: pick(CLAR_RE.code, clarification), note,
+  };
+}
+function composeAddress(p: AddressParts): { raw: string; clarification: string } {
+  const raw = [p.street && `Москва, ${p.street}`, p.house && `д. ${p.house}`, p.korpus && `корп. ${p.korpus}`]
+    .filter(Boolean).join(", ");
+  const tagged = [p.entrance && `подъезд ${p.entrance}`, p.floor && `этаж ${p.floor}`, p.code && `код ${p.code}`]
+    .filter(Boolean).join(", ");
+  return { raw, clarification: tagged && p.note ? `${tagged}; ${p.note}` : tagged || p.note };
+}
+
+
 /**
  * Card entry laid out like the real АРМ-112: address and caller's words on the left, the
  * «что случилось?» questionnaire on the right (tag buttons from the real classifier), and the
@@ -124,6 +154,18 @@ export function ArmEntryEditor({
     onChange({ ...card, incident_type_id: null, notified_services: [] });
   };
   const set = (patch: Partial<EntryCard>) => onChange({ ...card, ...patch });
+  // Parts are local state so a half-typed field is never lost; the stored strings follow them.
+  const [address, setParts] = useState<AddressParts>(() => parseAddress(card.address.raw, card.address.clarification));
+  useEffect(() => {
+    const current = composeAddress(address);
+    if (current.raw !== card.address.raw || current.clarification !== card.address.clarification) {
+      setParts(parseAddress(card.address.raw, card.address.clarification));
+    }
+  }, [card.address.raw, card.address.clarification]); // eslint-disable-line react-hooks/exhaustive-deps
+  const setAddress = (parts: AddressParts) => {
+    setParts(parts);
+    set({ address: composeAddress(parts) });
+  };
 
   return (
     <div className={styles.arm}>
@@ -162,30 +204,37 @@ export function ArmEntryEditor({
             />
           </div>
           <div className={`${styles.panel} ${styles.address}`}>
-            <label>
-              <span className={styles.label}>Адрес:</span>
-              <input
-                maxLength={500}
-                disabled={disabled}
-                placeholder="Москва, улица, дом"
-                value={card.address.raw}
-                onChange={(e) => set({ address: { ...card.address, raw: e.target.value } })}
-              />
-            </label>
-            <div className={styles.addressGrid} aria-hidden>
-              {["Страна", "Субъект", "Населённый пункт", "Улица", "Дом/Вл.", "Корпус", "Подъезд", "Этаж", "Код"].map((name) => (
-                <span key={name}>{name}:</span>
+            <span className={styles.label}>Адрес:</span>
+            <strong className={styles.addressLine}>{card.address.raw || "Москва"}</strong>
+            <div className={styles.addressGrid}>
+              {([
+                ["street", "Улица", 255],
+                ["house", "Дом/Вл.", 20],
+                ["korpus", "Корпус", 20],
+                ["entrance", "Подъезд", 20],
+                ["floor", "Этаж", 20],
+                ["code", "Код", 40],
+              ] as const).map(([key, label, max]) => (
+                <label key={key} className={key === "street" ? styles.wide : undefined}>
+                  <span>{label}:</span>
+                  <input
+                    maxLength={max}
+                    disabled={disabled}
+                    value={address[key]}
+                    onChange={(e) => setAddress({ ...address, [key]: e.target.value })}
+                  />
+                </label>
               ))}
             </div>
             <label>
-              <span className={styles.label}>Описательный адрес / уточнение:</span>
+              <span className={styles.label}>Описательный адрес:</span>
               <textarea
                 rows={2}
-                maxLength={1000}
+                maxLength={600}
                 disabled={disabled}
-                placeholder="корпус, подъезд, этаж, код; ориентиры"
-                value={card.address.clarification}
-                onChange={(e) => set({ address: { ...card.address, clarification: e.target.value } })}
+                placeholder="ориентиры: «напротив Большого Нижнего пруда», «вход со двора»"
+                value={address.note}
+                onChange={(e) => setAddress({ ...address, note: e.target.value })}
               />
             </label>
           </div>
