@@ -1,0 +1,75 @@
+/* АРМ-112 card entry, matched to the customer's screenshots (ПОВ-112, «КАРТОЧКА 112.docx»). */
+.arm, .head { --arm-bg: #e3e5e8; --arm-panel: #f4f5f6; --arm-line: #c9cdd2; --arm-blue: #1a74c4; --arm-orange: #ec6a3d;
+  --arm-red: #e8141b; --arm-text: #2b2f33; color: var(--arm-text); font-size: 14px; }
+.arm { background: var(--arm-bg); display: grid; gap: 6px; padding: 6px; border-radius: 2px; }
+.head { padding: 6px 6px 0; }
+
+.head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: stretch; }
+.incoming { background: var(--arm-panel); border: 1px solid var(--arm-line); padding: 6px 10px; display: flex; gap: 10px; align-items: center; min-width: 0; }
+.incoming p { margin: 0; overflow: hidden; text-overflow: ellipsis; }
+.incoming strong { white-space: nowrap; }
+.number { background: #fff; border: 1px solid var(--arm-line); padding: 6px 12px; min-width: 240px; line-height: 1.3; }
+.number strong { display: block; font-size: 16px; }
+.number span { font-size: 12px; color: #555; }
+.clock { background: #2f3337; color: #fff; min-width: 120px; padding: 4px 10px; display: grid; justify-items: center; }
+.clock.late { background: var(--arm-red); }
+.clock b { font: 700 34px/1 "Roboto Mono", ui-monospace, monospace; letter-spacing: 1px; }
+.clock small { display: flex; justify-content: space-between; width: 100%; font-size: 10px; }
+
+.phones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.phone { background: var(--arm-panel); border: 1px solid var(--arm-line); padding: 4px 10px; display: grid; }
+.phone span { font-size: 11px; color: #666; }
+.phone input { border: 0; border-bottom: 1px solid var(--arm-line); background: transparent; font-size: 18px; padding: 2px 0; }
+
+.columns { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 6px; }
+.left, .right { display: grid; gap: 6px; align-content: start; }
+.panel { background: var(--arm-panel); border: 1px solid var(--arm-line); padding: 8px 10px; display: grid; gap: 6px; }
+.panel input, .panel textarea { width: 100%; border: 0; border-bottom: 1px solid var(--arm-line); background: transparent; font: inherit; padding: 4px 0; }
+.panel textarea { resize: vertical; }
+.applicant { font-size: 16px; }
+.label { font-size: 12px; color: #555; }
+.address label { display: grid; }
+.addressGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 12px; font-size: 11px; color: #7a7f85; }
+.addressGrid span { border-bottom: 1px solid var(--arm-line); padding: 6px 0 2px; }
+.grow { min-height: 180px; }
+.counter { justify-self: end; font-size: 11px; color: #666; }
+
+.modifiers { display: flex; flex-wrap: wrap; gap: 4px; background: var(--arm-panel); border: 1px solid var(--arm-line); padding: 6px; }
+.modifiers button, .tags button { background: #fff; border: 1px solid #b9bec4; border-radius: 2px; padding: 6px 10px; font: 600 13px/1.2 inherit; color: var(--arm-text); cursor: pointer; }
+.modifiers button:hover, .tags button:hover { border-color: var(--arm-blue); }
+.on, .modifiers .on, .tags .on { background: var(--arm-blue); border-color: var(--arm-blue); color: #fff; }
+.what { font-size: 18px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.incident { background: #fff; border: 1px solid var(--arm-line); }
+.incidentHead { background: #2f3337; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-weight: 600; }
+.incidentHead span { text-decoration: underline; }
+.incidentHead button { background: none; border: 0; color: #fff; font-size: 18px; cursor: pointer; }
+.question { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 10px; padding: 8px 10px; border-bottom: 1px solid #eceef0; }
+.question > span { color: #555; padding-top: 6px; }
+.final { margin: 0; padding: 8px 10px; }
+
+.serviceBar { position: sticky; bottom: 0; z-index: 5; background: var(--arm-orange); color: #fff; display: flex; align-items: stretch; gap: 8px; padding: 6px 8px; min-height: 58px; }
+.barLabel { align-self: center; font-weight: 600; }
+.serviceTabs { display: flex; flex-wrap: wrap; gap: 2px; flex: 1; align-items: stretch; }
+.serviceTab { background: rgba(255, 255, 255, 0.14); border-bottom: 2px solid #fff; padding: 6px 10px; font-weight: 600; display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.serviceTab button { background: none; border: 0; color: #fff; cursor: pointer; }
+.add { background: none; border: 2px solid #fff; color: #fff; width: 42px; font-size: 22px; cursor: pointer; }
+.barActions { display: flex; gap: 6px; align-items: center; }
+.barActions button { background: transparent; border: 2px solid #fff; color: #fff; font: 700 17px/1 inherit; padding: 10px 16px; cursor: pointer; }
+.barActions button:disabled { opacity: 0.55; cursor: default; }
+.barActions .submit { background: #fff; color: var(--arm-orange); }
+
+.modalBackdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); display: grid; place-items: center; z-index: 20; }
+.modal { background: #fff; width: min(420px, 92vw); max-height: 80vh; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; gap: 8px; padding: 16px; position: relative; }
+.modal h2 { margin: 0; text-align: center; font-size: 24px; }
+.modal input { border: 0; border-bottom: 1px solid var(--arm-line); font-size: 18px; padding: 4px 0; }
+.modal ul { list-style: none; margin: 0; padding: 0; overflow-y: auto; border: 1px solid #eceef0; }
+.modal li button { width: 100%; text-align: left; background: #fff; border: 0; border-bottom: 1px solid #eceef0; padding: 10px; cursor: pointer; }
+.modal li button:hover { background: #f1f5fa; }
+.close { position: absolute; right: 10px; top: 8px; background: none; border: 0; font-size: 18px; cursor: pointer; }
+.saveClose { justify-self: center; border: 1px solid var(--arm-orange); color: var(--arm-orange); background: #fff; font: 700 17px/1 inherit; padding: 10px 14px; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .columns, .phones, .head { grid-template-columns: 1fr; }
+  .question { grid-template-columns: 1fr; gap: 4px; }
+}

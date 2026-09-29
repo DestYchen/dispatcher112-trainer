@@ -11,13 +11,12 @@ import {
 } from "../lib/entryDraft";
 import { enqueue, readActions } from "../lib/offline";
 import { strings } from "../lib/strings";
-import { DeadlineBar } from "./CardView";
-import { EntryEditor } from "./EntryEditor";
+import { ArmEntryEditor } from "./ArmEntryEditor";
+import arm from "./Arm.module.css";
 import { EntryComparison } from "./EntryComparison";
 import { TerminalDialog } from "./TerminalDialog";
 import { CallRecording } from "./CallRecording";
 import styles from "./Workspace.module.css";
-import common from "./Common.module.css";
 
 export function CardEntry({
   detail,
@@ -162,54 +161,38 @@ export function CardEntry({
     }
   }
   const seconds = remaining(detail.timers.processing_deadline_at, now);
+  // The real АРМ-112 shows time spent on the card, counting up.
+  const elapsed = Math.max(0, settings.card_processing_deadline_sec - (seconds ?? settings.card_processing_deadline_sec));
   return (
     <article className={styles.card} aria-label={detail.card.card_number}>
-      <header className={styles.cardHeader}>
-        <div>
-          <p>{strings.incomingMessage}</p>
-          <h1 className={styles.number}>{detail.card.card_number}</h1>
+      <div className={arm.head}>
+        <div className={arm.incoming}>
+          <strong>☎ Обращение:</strong>
+          <p title={entry.incoming_message}>{entry.incoming_message}</p>
         </div>
-      </header>
-      <div className={`${styles.timerArea} ${styles.entryTimer}`}>
-        <div>
-          <div
-            className={`${styles.timer} ${(entry.accepted_delay_ms ?? 0) > settings.primary_status_deadline_sec * 1000 ? styles.alarm : styles.ok}`}
-            data-testid="primary-timer"
-          >
+        <div className={arm.number}>
+          <strong>Происшествие {detail.card.card_number}</strong>
+          <span data-testid="primary-timer">
             {entry.accepted_delay_ms === null
-              ? countdown(remaining(detail.timers.primary_deadline_at, now))
-              : countdown(Math.ceil(entry.accepted_delay_ms / 1000))}
-          </div>
-          <p>
-            {entry.accepted_delay_ms === null
-              ? strings.incomingNotAccepted
-              : strings.incomingAccepted}
-            {(entry.accepted_delay_ms ?? 0) >
-              settings.primary_status_deadline_sec * 1000 &&
-              ` · ${strings.overdue}`}
-          </p>
+              ? `${strings.incomingNotAccepted} · ${countdown(remaining(detail.timers.primary_deadline_at, now))}`
+              : `${strings.incomingAccepted} за ${countdown(Math.ceil(entry.accepted_delay_ms / 1000))}`}
+            {(entry.accepted_delay_ms ?? 0) > settings.primary_status_deadline_sec * 1000 && ` · ${strings.overdue}`}
+          </span>
         </div>
-        <div>
-          <div
-            className={`${styles.timer} ${(seconds ?? 1) < 0 && !closed ? styles.alarm : ""}`}
-            data-testid="processing-timer"
-          >
-            {closed ? "✓" : countdown(seconds)}
-          </div>
-          <p>{closed ? strings.cardClosed : strings.entryDeadline}</p>
-          {!closed && (
-            <DeadlineBar
-              seconds={seconds}
-              total={settings.card_processing_deadline_sec}
-              label={strings.entryDeadline}
-            />
-          )}
+        <div
+          className={`${arm.clock} ${!closed && elapsed > 60 ? arm.late : ""}`}
+          data-testid="processing-timer"
+          title={`${strings.entryDeadline}: ${countdown(seconds)}`}
+        >
+          <b>{closed ? "✓" : countdown(elapsed)}</b>
+          <small>
+            <span>минут</span>
+            <span>секунд</span>
+          </small>
         </div>
       </div>
-      <section className={styles.section}>
-        <h2>{strings.incomingMessage}</h2>
-        <p className={styles.description}>{entry.incoming_message}</p>
-        {voice && (
+      {voice && (
+        <section className={styles.section}>
           <div>
             <p>
               Голосовое обращение принимается через учебный телефон. Разговор
@@ -253,53 +236,49 @@ export function CardEntry({
                 />
               ))}
           </div>
-        )}
-      </section>
+        
+        </section>
+      )}
       {closed && entry.score ? (
         <EntryComparison score={entry.score} />
       ) : (
         <>
-          <EntryEditor
+          <ArmEntryEditor
             card={draft.card}
             onChange={change}
             disabled={pending || closed || (voice && !accepted)}
-            assignmentId={detail.assignment_id}
+            actions={
+              <>
+                <button disabled={pending || closed || (voice && !accepted)} onClick={() => send(false)}>
+                  сохранить
+                </button>
+                <button
+                  className={arm.submit}
+                  disabled={pending || closed || (voice && !accepted)}
+                  onClick={() => setConfirm(true)}
+                >
+                  сдать карточку
+                </button>
+              </>
+            }
           />
-          <section className={styles.section} id="student-actions">
-            <p>{strings.entryInstructions}</p>
-            <p role="status">
-              {pending
-                ? strings.entryQueued
-                : draft.dirty
-                  ? strings.entryLocal
-                  : draft.revision === 0
-                    ? strings.entryEmpty
-                    : strings.entrySaved}
+          <p role="status" className={arm.label}>
+            {pending
+              ? strings.entryQueued
+              : draft.dirty
+                ? strings.entryLocal
+                : draft.revision === 0
+                  ? strings.entryEmpty
+                  : strings.entrySaved}{" "}
+            <button disabled={pending} onClick={() => void reloadDraft()}>
+              {strings.entryConflict}
+            </button>
+          </p>
+          {error && (
+            <p role="alert" className={styles.alarm}>
+              {error.message}
             </p>
-            {error && (
-              <p role="alert" className={styles.alarm}>
-                {error.message}
-              </p>
-            )}
-            <div className={common.toolbar}>
-              <button
-                disabled={pending || closed || (voice && !accepted)}
-                onClick={() => send(false)}
-              >
-                {strings.saveDraft}
-              </button>
-              <button
-                className={common.primary}
-                disabled={pending || closed || (voice && !accepted)}
-                onClick={() => setConfirm(true)}
-              >
-                {strings.submitCard}
-              </button>
-              <button disabled={pending} onClick={() => void reloadDraft()}>
-                {strings.entryConflict}
-              </button>
-            </div>
-          </section>
+          )}
         </>
       )}
       {confirm && (

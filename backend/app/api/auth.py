@@ -162,6 +162,9 @@ async def login(body: LoginInput, request: Request, db: DB, cache: Cache) -> JSO
         )
         await db.commit()
         raise APIError(401, "UNAUTHENTICATED", "Неверный логин или пароль.")
+    # Only failed attempts should count toward the lockout: a student who signs in again
+    # several times during a lesson must not be locked out.
+    await cache.delete(key)
     session_seconds = policy.session_minutes * 60
     token, csrf = issue_token("session", str(user.id), session_seconds)
     db.add(
