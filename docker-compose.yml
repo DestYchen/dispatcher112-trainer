@@ -337,7 +337,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Run make bootstrap}
       SIP_MEDIA_ADDRESS: ${SIP_MEDIA_ADDRESS:-127.0.0.1}
     ports:
-      - '${SIP_MEDIA_BIND:-127.0.0.1}:10000-10199:10000-10199/udp'
+      - '${SIP_MEDIA_BIND:-127.0.0.1}:20000-20199:20000-20199/udp'
     volumes:
       - ./data/telephony:/data/telephony
       - ./data/voices:/data/voices:ro

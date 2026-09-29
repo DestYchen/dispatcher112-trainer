@@ -27,7 +27,7 @@ password = hmac.new(os.environ['JWT_SECRET'].encode(), b'sip-control-v1', hashli
 address = str(ipaddress.ip_address(os.environ.get('SIP_MEDIA_ADDRESS', '127.0.0.1')))
 local = socket.gethostbyname(socket.gethostname())
 (RUNTIME / 'rtp.conf').write_text(
-    '[general]\nrtpstart=10000\nrtpend=10199\nicesupport=yes\nstrictrtp=yes\n'
+    '[general]\nrtpstart=20000\nrtpend=20199\nicesupport=yes\nstrictrtp=yes\n'
     f'[ice_host_candidates]\n{local} => {address}\n', encoding='utf-8',
 )
 process = subprocess.Popen(['asterisk', '-f', '-g'])
