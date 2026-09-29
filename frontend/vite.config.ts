@@ -19,6 +19,8 @@ export default defineConfig({
     watch: { usePolling: true, interval: 300 },
     port: 5173,
     strictPort: true,
+    // Extra host names for LAN/Tailscale access (comma-separated); localhost and IPs always work.
+    allowedHosts: (process.env.VITE_ALLOWED_HOSTS ?? "").split(",").map((h) => h.trim()).filter(Boolean),
     proxy: {
       "/healthz": backend,
       "/api": { target: backend, ws: true },
