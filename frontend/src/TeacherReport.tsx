@@ -65,6 +65,7 @@ export function TeacherReport({ lessonId }: { lessonId: string }) {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
   });
+  const [format, setFormat] = useState<"pdf" | "xlsx" | "csv" | "xml">("pdf");
   const data = query.data;
   const maximum = Math.max(
     1,
@@ -74,31 +75,26 @@ export function TeacherReport({ lessonId }: { lessonId: string }) {
     <section className={styles.report}>
       <div className={common.toolbar}>
         <h1>{strings.lessonReport}</h1>
+        <label className={styles.exportPicker}>
+          <span className="visually-hidden">Формат отчёта</span>
+          <select
+            value={format}
+            onChange={(event) => setFormat(event.target.value as typeof format)}
+            disabled={!data || download.isPending}
+            aria-label="Формат отчёта"
+          >
+            <option value="pdf">PDF</option>
+            <option value="xlsx">Excel</option>
+            <option value="csv">CSV</option>
+            <option value="xml">XML</option>
+          </select>
+        </label>
         <button
           disabled={!data || download.isPending}
-          onClick={() => download.mutate("pdf")}
+          onClick={() => download.mutate(format)}
         >
-          {download.isPending ? t.preparing : strings.downloadPdf}
+          {download.isPending ? t.preparing : "Скачать отчёт"}
         </button>
-        <button
-          disabled={!data || download.isPending}
-          onClick={() => download.mutate("xlsx")}
-        >
-          {t.xlsx}
-        </button>
-        <button
-          disabled={!data || download.isPending}
-          onClick={() => download.mutate("csv")}
-        >
-          {t.csv}
-        </button>
-        <button
-          disabled={!data || download.isPending}
-          onClick={() => download.mutate("xml")}
-        >
-          {t.xml}
-        </button>
-        <button onClick={() => void query.refetch()}>{strings.retryNow}</button>
       </div>
       {download.error && <p role="alert">{download.error.message}</p>}
       <AsyncView
